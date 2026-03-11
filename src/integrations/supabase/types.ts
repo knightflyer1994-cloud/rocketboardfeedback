@@ -14,7 +14,133 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      feedback_answers: {
+        Row: {
+          answer: Json
+          chapter: number
+          created_at: string
+          id: string
+          question_key: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          answer?: Json
+          chapter: number
+          created_at?: string
+          id?: string
+          question_key: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: Json
+          chapter?: number
+          created_at?: string
+          id?: string
+          question_key?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_answers_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "feedback_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback_sessions: {
+        Row: {
+          company_size_eng: number | null
+          company_size_total: number | null
+          completed: boolean
+          created_at: string
+          hiring_volume: string | null
+          id: string
+          mode: string
+          persona_focus: string | null
+          role: string | null
+          updated_at: string
+          work_mode: string | null
+        }
+        Insert: {
+          company_size_eng?: number | null
+          company_size_total?: number | null
+          completed?: boolean
+          created_at?: string
+          hiring_volume?: string | null
+          id?: string
+          mode: string
+          persona_focus?: string | null
+          role?: string | null
+          updated_at?: string
+          work_mode?: string | null
+        }
+        Update: {
+          company_size_eng?: number | null
+          company_size_total?: number | null
+          completed?: boolean
+          created_at?: string
+          hiring_volume?: string | null
+          id?: string
+          mode?: string
+          persona_focus?: string | null
+          role?: string | null
+          updated_at?: string
+          work_mode?: string | null
+        }
+        Relationships: []
+      }
+      feedback_summary: {
+        Row: {
+          created_at: string
+          friction_score: number | null
+          id: string
+          key_themes: Json
+          knowledge_concentration: Json
+          must_have_integrations: Json
+          session_id: string
+          top_bottlenecks: Json
+          updated_at: string
+          vision_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          friction_score?: number | null
+          id?: string
+          key_themes?: Json
+          knowledge_concentration?: Json
+          must_have_integrations?: Json
+          session_id: string
+          top_bottlenecks?: Json
+          updated_at?: string
+          vision_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          friction_score?: number | null
+          id?: string
+          key_themes?: Json
+          knowledge_concentration?: Json
+          must_have_integrations?: Json
+          session_id?: string
+          top_bottlenecks?: Json
+          updated_at?: string
+          vision_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_summary_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "feedback_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
