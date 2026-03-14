@@ -265,26 +265,6 @@ export default function FeedbackFlow() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isFirstChapter = chapters.findIndex(c => c.id === currentChapter) === 0;
-  const isLastChapter = chapters.findIndex(c => c.id === currentChapter) === chapters.length - 1;
-
-  if (stage === 'welcome') return <WelcomeScreen onStart={() => setStage('mode')} />;
-  if (stage === 'mode') return <ModeSelector onSelect={handleModeSelect} />;
-
-  if (stage === 'report' && report) {
-    return (
-      <div className="min-h-screen px-4 py-20">
-        <div className="max-w-3xl mx-auto">
-          <InsightReport
-            report={report}
-            answers={answers}
-            onRequestDemo={() => alert('Thank you! We\'ll be in touch soon.')}
-          />
-        </div>
-      </div>
-    );
-  }
-
   const renderChapter = () => {
     const props = { answers: chapterAnswers, onChange: handleChange, mode };
     switch (currentChapter) {
@@ -302,36 +282,27 @@ export default function FeedbackFlow() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background relative selection:bg-primary/30">
-      {/* Subtle background effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/5 blur-[120px] rounded-full" />
-      </div>
+  const isFirstChapter = chapters.findIndex(c => c.id === currentChapter) === 0;
+  const isLastChapter = chapters.findIndex(c => c.id === currentChapter) === chapters.length - 1;
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-background/60 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg gradient-button flex items-center justify-center shadow-glow-primary">
-              <span className="text-primary-foreground font-bold font-heading">R</span>
-            </div>
-            <span className="font-heading font-bold text-lg tracking-tight">Rocketboard <span className="text-primary">Feedback</span></span>
-          </div>
-          
-          <a 
-            href="/results" 
-            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 hover:border-primary/30"
-          >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Dashboard
-          </a>
+  const renderContent = () => {
+    if (stage === 'welcome') return <WelcomeScreen onStart={() => setStage('mode')} />;
+    if (stage === 'mode') return <ModeSelector onSelect={handleModeSelect} />;
+    
+    if (stage === 'report' && report) {
+      return (
+        <div className="py-12">
+          <InsightReport
+            report={report}
+            answers={answers}
+            onRequestDemo={() => alert('Thank you! We\'ll be in touch soon.')}
+          />
         </div>
-      </nav>
+      );
+    }
 
-      <ProgressBar mode={mode} currentChapter={currentChapter} />
-
-      <div className="max-w-3xl mx-auto px-4 pt-28 pb-24">
+    return (
+      <div className="pt-20 pb-24">
         {renderChapter()}
 
         {/* Navigation — skip for chapter 10 which has its own submit */}
@@ -366,6 +337,44 @@ export default function FeedbackFlow() {
           </div>
         )}
       </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background relative selection:bg-primary/30">
+      {/* Subtle background effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/5 blur-[120px] rounded-full" />
+      </div>
+
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-background/60 backdrop-blur-xl">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+          <a href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg gradient-button flex items-center justify-center shadow-glow-primary">
+              <span className="text-primary-foreground font-bold font-heading">R</span>
+            </div>
+            <span className="font-heading font-bold text-lg tracking-tight">Rocketboard <span className="text-primary">Feedback</span></span>
+          </a>
+          
+          <a 
+            href="/results" 
+            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 hover:border-primary/30"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Dashboard
+          </a>
+        </div>
+      </nav>
+
+      {stage === 'flow' && <ProgressBar mode={mode} currentChapter={currentChapter} />}
+
+      <main className={cn(
+        "relative z-10 max-w-3xl mx-auto px-4",
+        stage === 'flow' ? "pt-40" : "pt-16"
+      )}>
+        {renderContent()}
+      </main>
     </div>
   );
 }
