@@ -18,7 +18,7 @@ import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers } fro
 import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { cn } from '@/lib/utils';
 
-const VISION_TEXT = `We are developing a modern engineering onboarding platform and are conducting research to better understand the current landscape. Our goal is to identify common pain points, map the data sources teams rely on, and gather actionable insights to streamline the ramp-up process for new hires.`;
+
 
 const ROLE_LABELS: Record<string, string> = {
   vpe: 'VP Engineering', cto: 'CTO', em: 'Engineering Manager', staff: 'Staff Engineer',
@@ -45,18 +45,11 @@ function WelcomeScreen({ onStart }: { onStart: () => void }) {
           <p className="text-accent text-lg font-heading font-medium">Shaping the future of engineering ramp-up</p>
         </div>
 
-        <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full gradient-progress" />
-          <p className="text-muted-foreground leading-relaxed text-sm pl-3">
-            {VISION_TEXT}
-          </p>
-        </div>
-
-        <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
+        <div className="p-6 rounded-2xl border border-border bg-card space-y-5">
           <p className="text-foreground leading-relaxed">
-            We're in early stages building an AI-enhanced onboarding platform for engineering teams and would value your perspective. <span className="text-primary font-medium">This will take ~20 minutes.</span>
+            We are developing a modern engineering onboarding platform and are conducting research to better understand the current landscape, pain points, and data sources that drive engineering success. As we are in the early stages, we would value your perspective to help shape our direction. <span className="text-primary font-medium">This will take ~20 minutes.</span>
           </p>
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
+          <p className="text-sm text-muted-foreground flex items-center gap-2 pt-2 border-t border-white/5">
             <span className="text-score-low">🔒</span>
             Responses are fully confidential and used only in aggregate to guide product direction.
           </p>
