@@ -99,6 +99,9 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
     }
   };
 
+  const topBottlenecks = report.topBottlenecks || [];
+  const mustHaveIntegrations = report.mustHaveIntegrations || [];
+
   return (
     <div className="animate-scale-in space-y-8">
       {/* Header */}
@@ -140,7 +143,7 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
             <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wider">Vision Fit</span>
           </div>
           <div className="flex items-end gap-2">
-            <span className="text-5xl font-heading font-bold text-primary">{report.visionScore}</span>
+            <span className="text-5xl font-heading font-bold text-primary">{report.visionScore ?? 0}</span>
             <span className="text-muted-foreground mb-1">/10</span>
           </div>
           <p className="text-xs text-muted-foreground">How well our platform addresses your challenges</p>
@@ -162,11 +165,11 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
       </div>
 
       {/* Top 3 Bottlenecks */}
-      {report.topBottlenecks.length > 0 && (
+      {topBottlenecks.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-lg font-heading font-bold text-foreground">🚧 Your Top Bottlenecks</h2>
           <div className="space-y-3">
-            {report.topBottlenecks.map((id, idx) => {
+            {topBottlenecks.map((id, idx) => {
               const card = BOTTLENECK_CARDS.find(c => c.id === id);
               if (!card) return null;
               return (
@@ -227,11 +230,11 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
       )}
 
       {/* Must-have integrations */}
-      {report.mustHaveIntegrations.length > 0 && (
+      {mustHaveIntegrations.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-lg font-heading font-bold text-foreground">🔌 Must-Have Integrations</h2>
           <div className="flex flex-wrap gap-2">
-            {report.mustHaveIntegrations.map((id, idx) => {
+            {mustHaveIntegrations.map((id, idx) => {
               const integration = INTEGRATION_OPTIONS.find(i => i.id === id);
               if (!integration) return null;
               return (

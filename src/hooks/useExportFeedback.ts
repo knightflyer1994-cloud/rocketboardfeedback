@@ -141,7 +141,7 @@ export function useExportFeedback() {
     // Cover Scores
     const scores = [
       { label: 'Friction Score', score: report.frictionScore || 0 },
-      { label: 'Vision Fit Score', score: report.visionScore || 0 },
+      { label: 'Vision Fit Score', score: report.visionScore ?? 0 },
     ];
     scores.forEach(s => scoreBar(s.label, s.score));
 
@@ -168,8 +168,9 @@ export function useExportFeedback() {
     heading('🚧 Top Bottlenecks', 16);
     lineBreak(2);
 
-    if (report.topBottlenecks.length > 0) {
-      report.topBottlenecks.forEach((id, idx) => {
+    const topBottlenecks = report.topBottlenecks || [];
+    if (topBottlenecks.length > 0) {
+      topBottlenecks.forEach((id, idx) => {
         const card = BOTTLENECK_CARDS.find(c => c.id === id);
         if (!card) return;
         checkPage(22);
@@ -281,9 +282,10 @@ export function useExportFeedback() {
     heading('🔌 Must-Have Integrations', 14, [6, 182, 212]);
     lineBreak(2);
 
-    if (report.mustHaveIntegrations.length > 0) {
+    const mustHaveInts = report.mustHaveIntegrations || [];
+    if (mustHaveInts.length > 0) {
       let intX = margin;
-      report.mustHaveIntegrations.forEach((id, idx) => {
+      mustHaveInts.forEach((id, idx) => {
         const integration = INTEGRATION_OPTIONS.find(i => i.id === id);
         if (!integration) return;
         const text = `${idx + 1}. ${integration.label}`;
@@ -435,7 +437,7 @@ export function useExportFeedback() {
     doc.setFontSize(10); doc.setFont('helvetica', 'normal');
     doc.setTextColor(140, 140, 180);
     const ch1b = answers[1] || {};
-    doc.text(`Friction Score: ${(report.frictionScore || 0).toFixed(1)} / 10 · Vision Fit: ${report.visionScore} / 10`, margin, y); y += 7;
+    doc.text(`Friction Score: ${(report.frictionScore || 0).toFixed(1)} / 10 · Vision Fit: ${report.visionScore ?? 0} / 10`, margin, y); y += 7;
     doc.text(`Generated: ${new Date().toISOString()}`, margin, y); y += 7;
     if (sessionId) { doc.text(`Session: ${sessionId}`, margin, y); y += 7; }
     divider();
@@ -443,7 +445,8 @@ export function useExportFeedback() {
     // Bottlenecks
     doc.setFontSize(13); doc.setFont('helvetica', 'bold'); doc.setTextColor(99, 102, 241);
     doc.text('Top Bottlenecks', margin, y); y += 8;
-    report.topBottlenecks.forEach((id, idx) => {
+    const topBots = report.topBottlenecks || [];
+    topBots.forEach((id, idx) => {
       const card = BOTTLENECK_CARDS.find(c => c.id === id);
       if (card) body(`${idx + 1}. ${card.label} — ${card.desc}`, 9, 4);
     });

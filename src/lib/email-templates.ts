@@ -9,8 +9,8 @@ export function buildReportEmail(report: InsightReportType, answers: AllAnswers)
   };
   const role = roleLabels[ch1.role as string] || (ch1.role as string) || 'Engineering Leader';
   const frictionColor = (report.frictionScore || 0) <= 3 ? '#10b981' : (report.frictionScore || 0) <= 6 ? '#f59e0b' : '#ef4444';
-  const topBots = report.topBottlenecks.slice(0, 3).map(id => BOTTLENECK_CARDS.find(c => c.id === id)?.label || id).join(', ');
-  const topInts = report.mustHaveIntegrations.slice(0, 3).map(id => INTEGRATION_OPTIONS.find(i => i.id === id)?.label || id).join(', ');
+  const topBots = (report.topBottlenecks || []).slice(0, 3).map(id => BOTTLENECK_CARDS.find(c => c.id === id)?.label || id).join(', ');
+  const topInts = (report.mustHaveIntegrations || []).slice(0, 3).map(id => INTEGRATION_OPTIONS.find(i => i.id === id)?.label || id).join(', ');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -65,7 +65,7 @@ export function buildReportEmail(report: InsightReportType, answers: AllAnswers)
     ${topBots ? `
     <div style="background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:24px;margin-bottom:20px;">
       <h2 style="margin:0 0 16px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;">🚧 Your Top Bottlenecks</h2>
-      ${report.topBottlenecks.slice(0, 3).map((id, idx) => {
+      ${(report.topBottlenecks || []).slice(0, 3).map((id, idx) => {
         const card = BOTTLENECK_CARDS.find(c => c.id === id);
         if (!card) return '';
         const rankColors = ['#ef4444', '#f59e0b', '#6366f1'];
@@ -85,7 +85,7 @@ export function buildReportEmail(report: InsightReportType, answers: AllAnswers)
     <div style="background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:24px;margin-bottom:20px;">
       <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;">🔌 Must-Have Integrations</h2>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${report.mustHaveIntegrations.slice(0, 5).map((id, idx) => {
+        ${(report.mustHaveIntegrations || []).slice(0, 5).map((id, idx) => {
           const int = INTEGRATION_OPTIONS.find(i => i.id === id);
           if (!int) return '';
           return `<span style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:999px;padding:4px 12px;font-size:11px;color:#a5b4fc;font-weight:600;">${idx + 1}. ${int.label}</span>`;
