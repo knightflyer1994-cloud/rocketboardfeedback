@@ -186,10 +186,10 @@ export default function Results() {
                           <p className="text-[10px] text-muted-foreground uppercase font-semibold">Friction</p>
                           <p className={cn(
                             "font-heading font-bold",
-                            s.summary.frictionScore <= 3 ? "text-score-low" : 
-                            s.summary.frictionScore <= 6 ? "text-score-mid" : "text-score-high"
+                            (s.summary.frictionScore || 0) <= 3 ? "text-score-low" : 
+                            (s.summary.frictionScore || 0) <= 6 ? "text-score-mid" : "text-score-high"
                           )}>
-                            {s.summary.frictionScore.toFixed(1)}
+                            {(s.summary.frictionScore || 0).toFixed(1)}
                           </p>
                         </div>
                       )}

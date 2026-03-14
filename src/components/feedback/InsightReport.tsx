@@ -15,7 +15,10 @@ function ScoreMeter({ score, max = 10, label }: { score: number; max?: number; l
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium text-foreground">{label}</span>
-        <span className="text-2xl font-heading font-bold" style={{ color }}>{score.toFixed(1)}<span className="text-xs text-muted-foreground">/{max}</span></span>
+        <span className="text-2xl font-heading font-bold" style={{ color }}>
+          {(score || 0).toFixed(1)}
+          <span className="text-xs text-muted-foreground">/{max}</span>
+        </span>
       </div>
       <div className="h-2 bg-secondary rounded-full overflow-hidden">
         <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
@@ -37,7 +40,8 @@ export function InsightReport({ report, answers, onRequestDemo }: Props) {
   const knowledgeSources = (ch4.knowledge_sources as string[]) || [];
   const sourceFreshness = (ch4.source_freshness as Record<string, string>) || {};
   const staleCount = Object.values(sourceFreshness).filter(v => v === 'stale').length;
-  const frictionColor = report.frictionScore <= 3 ? 'hsl(var(--score-low))' : report.frictionScore <= 6 ? 'hsl(var(--score-mid))' : 'hsl(var(--score-high))';
+  const fScore = report.frictionScore || 0;
+  const frictionColor = fScore <= 3 ? 'hsl(var(--score-low))' : fScore <= 6 ? 'hsl(var(--score-mid))' : 'hsl(var(--score-high))';
 
   return (
     <div className="animate-scale-in space-y-8">
@@ -66,7 +70,9 @@ export function InsightReport({ report, answers, onRequestDemo }: Props) {
             <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wider">Friction Score</span>
           </div>
           <div className="flex items-end gap-2">
-            <span className="text-5xl font-heading font-bold" style={{ color: frictionColor }}>{report.frictionScore.toFixed(1)}</span>
+            <span className="text-5xl font-heading font-bold" style={{ color: frictionColor }}>
+              {(report.frictionScore || 0).toFixed(1)}
+            </span>
             <span className="text-muted-foreground mb-1">/10</span>
           </div>
           <p className="text-xs text-muted-foreground">Based on impact ratings and bottleneck severity</p>
@@ -195,7 +201,7 @@ export function InsightReport({ report, answers, onRequestDemo }: Props) {
                 <p className="text-sm font-medium text-foreground capitalize">{(report.keyThemes.workMode as string).replace('_', ' ')}</p>
               </div>
             )}
-            {report.keyThemes.productivityMetrics && (report.keyThemes.productivityMetrics as string[]).length > 0 && (
+            {report.keyThemes?.productivityMetrics && (report.keyThemes.productivityMetrics as string[]).length > 0 && (
               <div className="p-3 rounded-xl border border-border bg-card">
                 <p className="text-xs text-muted-foreground font-heading uppercase tracking-wider mb-1">Success Metrics</p>
                 <p className="text-sm font-medium text-foreground">{(report.keyThemes.productivityMetrics as string[]).slice(0, 3).join(' · ')}</p>
