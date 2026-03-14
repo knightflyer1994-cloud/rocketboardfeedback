@@ -295,6 +295,7 @@ export default function FeedbackFlow() {
           <InsightReport
             report={report}
             answers={answers}
+            sessionId={session?.id}
             onRequestDemo={() => alert('Thank you! We\'ll be in touch soon.')}
           />
         </div>
