@@ -229,7 +229,38 @@ export default function Results() {
                     <InsightReport 
                       report={selectedSubmission.summary} 
                       answers={detailedAnswers}
-                      onRequestDemo={() => toast('Request demo triggered (simulated)')}
+                      onRequestDemo={async () => {
+                        toast.promise(
+                          supabase.functions.invoke('send-email', {
+                            body: {
+                              subject: `🚨 DEMO REQUEST: ${selectedSubmission.summary?.keyThemes.role || 'Participant'}`,
+                              html: `
+                                <div style="font-family:sans-serif;background:#0f172a;color:#f8fafc;padding:40px;border-radius:12px;border:1px solid #1e293b;">
+                                  <h1 style="color:#6366f1;margin:0 0 16px;">New Demo Request!</h1>
+                                  <p style="font-size:16px;color:#94a3b8;">A participant has requested an early demo after completing their onboarding feedback.</p>
+                                  
+                                  <div style="background:#1e293b;border-radius:8px;padding:20px;margin:24px 0;">
+                                    <p style="margin:0 0 8px;"><strong>Role:</strong> ${selectedSubmission.summary?.keyThemes.role || 'Unknown'}</p>
+                                    <p style="margin:0 0 8px;"><strong>Company Size:</strong> ${selectedSubmission.summary?.keyThemes.companySize || 'Unknown'}</p>
+                                    <p style="margin:0;"><strong>Report ID:</strong> ${selectedId}</p>
+                                  </div>
+
+                                  <a href="https://ysjhnokgziuaphunmgdh.supabase.co/results" 
+                                     style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
+                                    View Full Insight Report →
+                                  </a>
+                                </div>
+                              `,
+                              is_admin_alert: true
+                            }
+                          }),
+                          {
+                            loading: 'Sending request...',
+                            success: 'Demo request sent!',
+                            error: 'Failed to send request.'
+                          }
+                        );
+                      }}
                     />
                   </div>
                 ) : (

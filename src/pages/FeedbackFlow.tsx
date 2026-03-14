@@ -4,6 +4,7 @@ import { ProgressBar } from '@/components/feedback/ProgressBar';
 import { Chapter1Snapshot } from '@/components/feedback/chapters/Chapter1Snapshot';
 import { Chapter2Reality } from '@/components/feedback/chapters/Chapter2Reality';
 import { Chapter3Bottlenecks } from '@/components/feedback/chapters/Chapter3Bottlenecks';
+import { toast } from 'sonner';
 import { Chapter4Knowledge } from '@/components/feedback/chapters/Chapter4Knowledge';
 import { Chapter5Integrations } from '@/components/feedback/chapters/Chapter5Integrations';
 import { Chapter6Services } from '@/components/feedback/chapters/Chapter6Services';
@@ -286,6 +287,42 @@ export default function FeedbackFlow() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleDemoRequest = async () => {
+    if (!session) return;
+    
+    // Optimistic toast
+    toast.promise(
+      supabase.functions.invoke('send-email', {
+        body: {
+          subject: `🚨 DEMO REQUEST: ${report?.keyThemes.role || 'Participant'}`,
+          html: `
+            <div style="font-family:sans-serif;background:#0f172a;color:#f8fafc;padding:40px;border-radius:12px;border:1px solid #1e293b;">
+              <h1 style="color:#6366f1;margin:0 0 16px;">New Demo Request!</h1>
+              <p style="font-size:16px;color:#94a3b8;">A participant has requested an early demo after completing their onboarding feedback.</p>
+              
+              <div style="background:#1e293b;border-radius:8px;padding:20px;margin:24px 0;">
+                <p style="margin:0 0 8px;"><strong>Role:</strong> ${report?.keyThemes.role || 'Unknown'}</p>
+                <p style="margin:0 0 8px;"><strong>Company Size:</strong> ${report?.keyThemes.companySize || 'Unknown'}</p>
+                <p style="margin:0;"><strong>Report ID:</strong> ${session.id}</p>
+              </div>
+
+              <a href="https://ysjhnokgziuaphunmgdh.supabase.co/results" 
+                 style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
+                View Full Insight Report →
+              </a>
+            </div>
+          `,
+          is_admin_alert: true
+        }
+      }),
+      {
+        loading: 'Sending request...',
+        success: 'Demo request sent! We will contact you soon.',
+        error: 'Failed to send request. Please try again or contact support.'
+      }
+    );
+  };
+
   const renderChapter = () => {
     const props = { answers: chapterAnswers, onChange: handleChange, mode };
     switch (currentChapter) {
@@ -317,7 +354,7 @@ export default function FeedbackFlow() {
             report={report}
             answers={answers}
             sessionId={session?.id}
-            onRequestDemo={() => alert('Thank you! We\'ll be in touch soon.')}
+            onRequestDemo={handleDemoRequest}
           />
         </div>
       );
