@@ -18,7 +18,7 @@ import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers } fro
 import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { cn } from '@/lib/utils';
 
-const VISION_TEXT = `We're building an AI-powered platform that connects to a company's existing knowledge sources (docs, code repos, chats, wikis), automatically organizes and keeps that knowledge fresh, creates personalized onboarding experiences and learning paths for new engineers, and provides grounded AI assistance so new hires can ask questions and get accurate answers based on the company's own data.`;
+const VISION_TEXT = `We are developing a modern engineering onboarding platform and are conducting research to better understand the current landscape. Our goal is to identify common pain points, map the data sources teams rely on, and gather actionable insights to streamline the ramp-up process for new hires.`;
 
 const ROLE_LABELS: Record<string, string> = {
   vpe: 'VP Engineering', cto: 'CTO', em: 'Engineering Manager', staff: 'Staff Engineer',
