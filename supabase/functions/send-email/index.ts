@@ -33,13 +33,22 @@ Deno.serve(async (req) => {
     const { to, subject, html, attachments, from, is_admin_alert } = payload;
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
 
-    if (is_admin_alert && !ADMIN_EMAIL) {
-      throw new Error('ADMIN_EMAIL is not configured for alerts');
+    // Granular validation
+    const missing = [];
+    if (!subject) missing.push('subject');
+    if (!html) missing.push('html');
+    if (!is_admin_alert && !to) missing.push('to');
+
+    if (missing.length > 0) {
+      return new Response(
+        JSON.stringify({ error: `Missing required fields: ${missing.join(', ')}`, received_payload: { subject: !!subject, html: !!html, to: !!to, is_admin_alert: !!is_admin_alert } }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    if (!is_admin_alert && (!to || !subject || !html)) {
+    if (is_admin_alert && !ADMIN_EMAIL) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: to, subject, html' }),
+        JSON.stringify({ error: 'ADMIN_EMAIL is not configured in environment variables' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
