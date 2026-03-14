@@ -53,9 +53,12 @@ Deno.serve(async (req) => {
       );
     }
 
+    const targetRecipient = is_admin_alert ? ADMIN_EMAIL : to;
+    console.log(`[send-email] Attempting to send ${is_admin_alert ? 'ADMIN ALERT' : 'standard email'} to: ${targetRecipient}`);
+
     const emailBody: Record<string, unknown> = {
       from: from || 'Onboarding Insights <reports@resend.dev>',
-      to: [is_admin_alert ? ADMIN_EMAIL : to],
+      to: [targetRecipient],
       subject: subject || 'New Insight Report',
       html,
     };
@@ -81,6 +84,19 @@ Deno.serve(async (req) => {
 
     if (!resendRes.ok) {
       console.error('Resend error:', resendData);
+      
+      // Specifically handle sandbox restriction error message
+      if (resendData.message?.includes('testing emails to your own email address')) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Resend Sandbox Restriction",
+            message: `Resend is in Sandbox mode. You can ONLY send emails to your account email (kirannreddyaero@gmail.com). Currently trying to send to: ${targetRecipient}. Please update your ADMIN_EMAIL secret in Supabase to match your Resend account email or verify a domain on Resend.`,
+            details: resendData.message
+          }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       throw new Error(resendData.message || 'Failed to send email via Resend');
     }
 
