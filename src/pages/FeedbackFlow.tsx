@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 import { ProgressBar } from '@/components/feedback/ProgressBar';
 import { Chapter1Snapshot } from '@/components/feedback/chapters/Chapter1Snapshot';
 import { Chapter2Reality } from '@/components/feedback/chapters/Chapter2Reality';
@@ -259,6 +260,26 @@ export default function FeedbackFlow() {
     const computed = computeReport(answers);
     if (session) {
       await saveSummary(session.id, computed);
+      
+      // Trigger real-time admin notification
+      try {
+        const { buildReportEmail } = await import('@/lib/email-templates');
+        const html = buildReportEmail(computed, answers);
+        
+        // Use a background call to send-email edge function
+        supabase.functions.invoke('send-email', {
+          body: {
+            // ADMIN_EMAIL is handled by the edge function itself typically
+            // but we can pass a special flag or just the fallback
+            subject: `Real-time Alert: New Feedback from ${computed.keyThemes.role || 'Contributor'}`,
+            html,
+            is_admin_alert: true
+          }
+        }).catch(err => console.error('Silent failure of admin alert:', err));
+        
+      } catch (err) {
+        console.error('Failed to prepare admin alert:', err);
+      }
     }
     setReport(computed);
     setStage('report');

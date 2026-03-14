@@ -64,7 +64,7 @@ function buildDigestHtml(sessions: Array<Record<string, unknown>>, weekStart: st
     <!-- Header -->
     <div style="text-align:center;margin-bottom:40px;">
       <div style="display:inline-block;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;">
-        🚀 Weekly Insights Digest
+        🚀 Daily Insights Digest
       </div>
       <p style="color:#9ca3af;font-size:14px;margin:4px 0 0;">${weekStart} — ${weekEnd}</p>
     </div>
@@ -179,23 +179,23 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Get sessions from the past 7 days
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+    // Get sessions from the past 24 hours
+    const dayAgo = new Date();
+    dayAgo.setDate(dayAgo.getDate() - 1);
 
     const { data: sessions, error } = await supabase
       .from('feedback_sessions')
       .select('*, summary:feedback_summary(*)')
       .eq('completed', true)
-      .gte('created_at', weekAgo.toISOString())
+      .gte('created_at', dayAgo.toISOString())
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    const weekStart = weekAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const weekEnd = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const dayLabel = dayAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const todayLabel = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    const html = buildDigestHtml(sessions || [], weekStart, weekEnd);
+    const html = buildDigestHtml(sessions || [], dayLabel, todayLabel);
 
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'Onboarding Insights <reports@resend.dev>',
         to: [ADMIN_EMAIL],
-        subject: `Weekly Digest: ${sessions?.length || 0} new responses — ${weekEnd}`,
+        subject: `Daily Digest: ${sessions?.length || 0} new responses — ${todayLabel}`,
         html,
       }),
     });

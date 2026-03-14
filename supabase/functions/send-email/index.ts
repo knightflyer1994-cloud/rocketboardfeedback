@@ -15,6 +15,7 @@ interface EmailPayload {
     type: string;
   }>;
   from?: string;
+  is_admin_alert?: boolean;
 }
 
 Deno.serve(async (req) => {
@@ -29,9 +30,14 @@ Deno.serve(async (req) => {
     }
 
     const payload: EmailPayload = await req.json();
-    const { to, subject, html, attachments, from } = payload;
+    const { to, subject, html, attachments, from, is_admin_alert } = payload;
+    const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
 
-    if (!to || !subject || !html) {
+    if (is_admin_alert && !ADMIN_EMAIL) {
+      throw new Error('ADMIN_EMAIL is not configured for alerts');
+    }
+
+    if (!is_admin_alert && (!to || !subject || !html)) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: to, subject, html' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -40,8 +46,8 @@ Deno.serve(async (req) => {
 
     const emailBody: Record<string, unknown> = {
       from: from || 'Onboarding Insights <reports@resend.dev>',
-      to: [to],
-      subject,
+      to: [is_admin_alert ? ADMIN_EMAIL : to],
+      subject: subject || 'New Insight Report',
       html,
     };
 
