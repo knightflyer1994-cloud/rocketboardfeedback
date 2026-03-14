@@ -15,9 +15,10 @@ const IMPACT_SLIDERS = [
 interface Props {
   answers: ChapterAnswers;
   onChange: (key: string, value: unknown) => void;
+  mode?: 'fast' | 'deep' | 'executive';
 }
 
-export function Chapter3Bottlenecks({ answers, onChange }: Props) {
+export function Chapter3Bottlenecks({ answers, onChange, mode }: Props) {
   const openText = (answers.open_example as string) || '';
   const impacts = (answers.impacts as Record<string, number>) || {
     frustration: 5, time_to_productivity: 5, mentor_bandwidth: 5, attrition_risk: 5, knowledge_loss: 5,
@@ -67,8 +68,10 @@ export function Chapter3Bottlenecks({ answers, onChange }: Props) {
 
   return (
     <ChapterShell
-      title="Bottlenecks & impact"
-      subtitle="What's actually slowing down your new hires? Be specific — this is the heart of our research."
+      title={mode === 'executive' ? 'Strategic impact & challenges' : 'Bottlenecks & impact'}
+      subtitle={mode === 'executive' 
+        ? 'What are the high-level organizational costs of engineering ramp-up friction?' 
+        : "What's actually slowing down your new hires? Be specific — this is the heart of our research."}
     >
       {/* Open example */}
       <TextAreaField

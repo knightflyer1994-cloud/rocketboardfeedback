@@ -32,7 +32,7 @@ const SUPPORT_MODELS = [
 interface Props {
   answers: ChapterAnswers;
   onChange: (key: string, value: unknown) => void;
-  mode: 'fast' | 'deep';
+  mode: 'fast' | 'deep' | 'executive';
 }
 
 export function Chapter2Reality({ answers, onChange, mode }: Props) {

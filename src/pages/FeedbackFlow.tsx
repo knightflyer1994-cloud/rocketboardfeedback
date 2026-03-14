@@ -13,7 +13,7 @@ import { Chapter10Closing } from '@/components/feedback/chapters/Chapter10Closin
 import { InsightReport } from '@/components/feedback/InsightReport';
 import { useFeedbackSession } from '@/hooks/useFeedbackSession';
 import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers } from '@/types/feedback';
-import { CHAPTERS_FAST, CHAPTERS_DEEP, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
+import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { cn } from '@/lib/utils';
 
 const VISION_TEXT = `We're building an AI-powered platform that connects to a company's existing knowledge sources (docs, code repos, chats, wikis), automatically organizes and keeps that knowledge fresh, creates personalized onboarding experiences and learning paths for new engineers, and provides grounded AI assistance so new hires can ask questions and get accurate answers based on the company's own data.`;
@@ -82,6 +82,34 @@ function ModeSelector({ onSelect }: { onSelect: (mode: FlowMode) => void }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Executive Path */}
+          <button
+            onClick={() => onSelect('executive')}
+            className="group text-left p-6 rounded-2xl border border-accent/30 bg-accent/5 hover:border-accent/60 hover:shadow-glow-accent transition-all duration-300 space-y-4 relative"
+          >
+            <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-medium border border-accent/30">
+              New
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              🚀
+            </div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground group-hover:text-accent transition-colors">Executive Path</h3>
+              <p className="text-accent text-sm font-medium mt-1">3–4 minutes</p>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              High-level strategic pulse. Focuses on business impact, vision fit, and key organizational challenges. Best for Founders and Directors.
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {['Snapshot', 'Challenges', 'Vision', 'Closing'].map(t => (
+                <span key={t} className="px-2 py-0.5 rounded-full bg-accent/10 text-xs text-accent/80">{t}</span>
+              ))}
+            </div>
+            <div className="w-full py-2.5 rounded-xl border border-accent/40 bg-accent/10 text-accent text-sm font-heading font-semibold text-center group-hover:bg-accent/20 transition-colors">
+              Choose Executive Path →
+            </div>
+          </button>
+
           {/* Fast Track */}
           <button
             onClick={() => onSelect('fast')}
@@ -141,16 +169,17 @@ function ModeSelector({ onSelect }: { onSelect: (mode: FlowMode) => void }) {
 }
 
 function computeReport(answers: Record<number, ChapterAnswers>): InsightReportType {
+  const ch1 = answers[1] || {};
+  const ch2 = answers[2] || {};
   const ch3 = answers[3] || {};
   const ch4 = answers[4] || {};
   const ch5 = answers[5] || {};
   const ch8 = answers[8] || {};
-  const ch1 = answers[1] || {};
-  const ch2 = answers[2] || {};
 
   const impacts = (ch3.impacts as Record<string, number>) || {};
-  const avgImpact = Object.values(impacts).length > 0
-    ? Object.values(impacts).reduce((a, b) => a + b, 0) / Object.values(impacts).length
+  const impactValues = Object.values(impacts);
+  const avgImpact = impactValues.length > 0
+    ? impactValues.reduce((a, b) => a + b, 0) / impactValues.length
     : 5;
 
   const ranked = (ch3.ranked_bottlenecks as string[]) || [];
@@ -192,7 +221,7 @@ export default function FeedbackFlow() {
 
   const { session, answers, createSession, saveAnswer, updateSession, saveSummary } = useFeedbackSession();
 
-  const chapters = mode === 'deep' ? CHAPTERS_DEEP : CHAPTERS_FAST;
+  const chapters = mode === 'deep' ? CHAPTERS_DEEP : mode === 'fast' ? CHAPTERS_FAST : CHAPTERS_EXECUTIVE;
 
   const chapterAnswers = answers[currentChapter] || {};
 
@@ -261,12 +290,12 @@ export default function FeedbackFlow() {
     switch (currentChapter) {
       case 1: return <Chapter1Snapshot {...props} />;
       case 2: return <Chapter2Reality {...props} />;
-      case 3: return <Chapter3Bottlenecks answers={chapterAnswers} onChange={handleChange} />;
+      case 3: return <Chapter3Bottlenecks answers={chapterAnswers} onChange={handleChange} mode={mode} />;
       case 4: return <Chapter4Knowledge answers={chapterAnswers} onChange={handleChange} />;
       case 5: return <Chapter5Integrations answers={chapterAnswers} onChange={handleChange} />;
       case 6: return <Chapter6Services answers={chapterAnswers} onChange={handleChange} />;
       case 7: return <Chapter7Competitive answers={chapterAnswers} onChange={handleChange} />;
-      case 8: return <Chapter8Vision answers={chapterAnswers} onChange={handleChange} />;
+      case 8: return <Chapter8Vision answers={chapterAnswers} onChange={handleChange} mode={mode} />;
       case 9: return <Chapter9Adoption answers={chapterAnswers} onChange={handleChange} />;
       case 10: return <Chapter10Closing answers={chapterAnswers} onChange={handleChange} onComplete={handleComplete} />;
       default: return null;

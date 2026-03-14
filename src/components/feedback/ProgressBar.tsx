@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import type { FlowMode } from '@/types/feedback';
-import { CHAPTERS_FAST, CHAPTERS_DEEP } from '@/types/feedback';
+import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE } from '@/types/feedback';
 
 interface ProgressBarProps {
   mode: FlowMode;
@@ -9,7 +9,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ mode, currentChapter }: ProgressBarProps) {
-  const chapters = mode === 'deep' ? CHAPTERS_DEEP : CHAPTERS_FAST;
+  const chapters = mode === 'deep' ? CHAPTERS_DEEP : mode === 'fast' ? CHAPTERS_FAST : CHAPTERS_EXECUTIVE;
   const currentIdx = chapters.findIndex(c => c.id === currentChapter);
   const progress = currentIdx >= 0 ? ((currentIdx + 1) / chapters.length) * 100 : 0;
 

@@ -3,14 +3,14 @@ import { ChapterShell, SelectCard, NumberInput, SliderField } from '../FeedbackW
 import type { ChapterAnswers } from '@/types/feedback';
 
 const ROLES = [
-  { id: 'vpe', label: 'VP Engineering', icon: '🏛️' },
+  { id: 'founder', label: 'Founder / CEO', icon: '🚀' },
   { id: 'cto', label: 'CTO', icon: '⚙️' },
+  { id: 'vpe', label: 'VP Engineering', icon: '🏛️' },
+  { id: 'director', label: 'Director of Eng', icon: '🎯' },
+  { id: 'product', label: 'Product Lead', icon: '🎨' },
   { id: 'em', label: 'Eng Manager', icon: '👥' },
   { id: 'staff', label: 'Staff Engineer', icon: '🔭' },
   { id: 'senior', label: 'Senior Engineer', icon: '💻' },
-  { id: 'director', label: 'Director of Eng', icon: '🎯' },
-  { id: 'devex', label: 'DevEx / Platform', icon: '🛠️' },
-  { id: 'principal', label: 'Principal Engineer', icon: '🧬' },
 ];
 
 const HIRING_VOLUMES = [
@@ -41,7 +41,7 @@ const PERSONA_FOCUS = [
 interface Props {
   answers: ChapterAnswers;
   onChange: (key: string, value: unknown) => void;
-  mode: 'fast' | 'deep';
+  mode: 'fast' | 'deep' | 'executive';
 }
 
 export function Chapter1Snapshot({ answers, onChange, mode }: Props) {

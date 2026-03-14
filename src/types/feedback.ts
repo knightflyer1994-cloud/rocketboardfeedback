@@ -1,4 +1,4 @@
-export type FlowMode = 'fast' | 'deep';
+export type FlowMode = 'fast' | 'deep' | 'executive';
 
 export interface SessionData {
   id: string;
@@ -34,6 +34,13 @@ export interface InsightReport {
     openText?: string;
   };
 }
+
+export const CHAPTERS_EXECUTIVE = [
+  { id: 1, label: 'Snapshot' },
+  { id: 3, label: 'Challenges' },
+  { id: 8, label: 'Vision' },
+  { id: 10, label: 'Closing' },
+];
 
 export const CHAPTERS_FAST = [
   { id: 1, label: 'Snapshot' },

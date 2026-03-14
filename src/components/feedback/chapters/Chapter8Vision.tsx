@@ -26,9 +26,10 @@ const CONCERN_CARDS = [
 interface Props {
   answers: ChapterAnswers;
   onChange: (key: string, value: unknown) => void;
+  mode?: 'fast' | 'deep' | 'executive';
 }
 
-export function Chapter8Vision({ answers, onChange }: Props) {
+export function Chapter8Vision({ answers, onChange, mode }: Props) {
   const visionScore = (answers.vision_score as number) || 7;
   const excitements = (answers.excitements as string[]) || [];
   const concerns = (answers.concerns as string[]) || [];
@@ -60,6 +61,20 @@ export function Chapter8Vision({ answers, onChange }: Props) {
           "{VISION_TEXT}"
         </p>
       </div>
+
+      {/* ROI question — Executive only */}
+      {mode === 'executive' && (
+        <div className="p-5 rounded-xl bg-accent/10 border border-accent/20">
+          <SliderField
+            label="What is the potential ROI or strategic value of solving engineering ramp-up?"
+            value={(answers.roi_value as number) || 7}
+            onChange={v => onChange('roi_value', v)}
+            leftLabel="Marginal / Nice-to-have"
+            rightLabel="Strategic / Bottom-line impact"
+            description="How much do you value solving this problem from a business perspective?"
+          />
+        </div>
+      )}
 
       {/* Vision score */}
       <div className="p-5 rounded-xl bg-secondary/50 border border-border">

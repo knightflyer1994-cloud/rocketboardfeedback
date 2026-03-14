@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { SessionData, AllAnswers, InsightReport } from '@/types/feedback';
+import type { SessionData, AllAnswers, InsightReport, FlowMode } from '@/types/feedback';
 
 export function useFeedbackSession() {
   const [session, setSession] = useState<SessionData | null>(null);
   const [answers, setAnswers] = useState<AllAnswers>({});
   const [saving, setSaving] = useState(false);
 
-  const createSession = useCallback(async (mode: 'fast' | 'deep') => {
+  const createSession = useCallback(async (mode: FlowMode) => {
     setSaving(true);
     try {
       const { data, error } = await supabase

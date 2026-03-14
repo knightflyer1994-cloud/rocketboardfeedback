@@ -136,7 +136,7 @@ export function InsightReport({ report, answers, onRequestDemo }: Props) {
       {/* Knowledge Map */}
       {knowledgeSources.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-lg font-heading font-bold text-foreground">🗺️ Knowledge Concentration Map</h2>
+          <h2 className="text-lg font-heading font-bold text-foreground">Map to knowledge</h2>
           <div className="p-4 rounded-xl border border-border bg-card">
             <div className="flex flex-wrap gap-2">
               {knowledgeSources.map(id => {

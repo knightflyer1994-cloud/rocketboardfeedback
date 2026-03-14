@@ -16,16 +16,18 @@ export function SelectCard({ icon, label, desc, selected, onClick, size = 'md', 
     <button
       onClick={onClick}
       className={cn(
-        'relative text-left rounded-xl border transition-all duration-200 cursor-pointer group',
-        'hover:border-primary/50 hover:shadow-glow-primary',
+        'relative text-left rounded-xl border transition-all duration-300 cursor-pointer group overflow-hidden',
+        'hover:border-primary/50 hover:shadow-glow-primary hover:-translate-y-1',
         size === 'sm' && 'p-3',
         size === 'md' && 'p-4',
         size === 'lg' && 'p-5',
         selected
-          ? 'border-primary/60 bg-primary/10 shadow-glow-primary'
-          : 'border-border bg-card hover:bg-secondary/50',
+          ? 'border-primary/60 bg-primary/10 shadow-glow-primary scale-[1.02]'
+          : 'border-white/5 bg-white/5 backdrop-blur-md hover:bg-white/10',
       )}
     >
+      {/* Gloss reflection overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       {selected && (
         <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
           <span className="text-primary-foreground text-xs font-bold">✓</span>
@@ -213,7 +215,7 @@ export function ChapterShell({ children, title, subtitle }: {
   subtitle?: string;
 }) {
   return (
-    <div className="animate-slide-in-up space-y-8">
+    <div className="animate-slide-in-right space-y-8">
       {(title || subtitle) && (
         <div className="space-y-2">
           {title && (
