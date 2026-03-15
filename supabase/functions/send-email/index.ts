@@ -83,21 +83,27 @@ Deno.serve(async (req) => {
     const resendData = await resendRes.json();
 
     if (!resendRes.ok) {
-      console.error('Resend error:', resendData);
-      
-      // Specifically handle sandbox restriction error message
-      if (resendData.message?.includes('testing emails to your own email address')) {
+      console.error('Resend error:', JSON.stringify(resendData));
+
+      // Fuzzy-match sandbox restriction from both resendData.message and resendData.error.message
+      const resendErrorMsg: string =
+        resendData?.message ||
+        resendData?.error?.message ||
+        resendData?.error ||
+        '';
+
+      if (resendErrorMsg.includes('testing emails to your own email address')) {
         return new Response(
-          JSON.stringify({ 
-            error: "Resend Sandbox Restriction",
-            message: `Resend is in Sandbox mode. You can ONLY send emails to your account email (kirannreddyaero@gmail.com). Currently trying to send to: ${targetRecipient}. Please update your ADMIN_EMAIL secret in Supabase to match your Resend account email or verify a domain on Resend.`,
-            details: resendData.message
+          JSON.stringify({
+            error: 'Resend Sandbox Restriction',
+            message: `Resend is in Sandbox mode. You can ONLY send emails to your authorized account email (kirannreddyaero@gmail.com). Currently trying to send to: ${targetRecipient}. Please update your ADMIN_EMAIL secret to match your Resend account email, or verify a domain at resend.com/domains.`,
+            details: resendErrorMsg,
           }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      throw new Error(resendData.message || 'Failed to send email via Resend');
+      throw new Error(resendErrorMsg || 'Failed to send email via Resend');
     }
 
     return new Response(
