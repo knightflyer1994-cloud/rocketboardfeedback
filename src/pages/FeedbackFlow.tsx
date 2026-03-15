@@ -263,9 +263,6 @@ export default function FeedbackFlow() {
         // Use a background call to send-email edge function
         supabase.functions.invoke('send-email', {
           body: {
-            // ADMIN_EMAIL is handled by the edge function itself typically
-            // but we can pass a special flag or just the fallback
-            to: 'admin-alert-fallback@rocketboard.ai',
             subject: `Real-time Alert: New Feedback from ${computed.keyThemes.role || 'Contributor'}`,
             html,
             is_admin_alert: true
