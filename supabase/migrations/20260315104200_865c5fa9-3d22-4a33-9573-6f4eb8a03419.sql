@@ -1,0 +1,2 @@
+ALTER TABLE public.feedback_sessions DROP CONSTRAINT feedback_sessions_mode_check;
+ALTER TABLE public.feedback_sessions ADD CONSTRAINT feedback_sessions_mode_check CHECK (mode = ANY (ARRAY['fast'::text, 'deep'::text, 'executive'::text]));
