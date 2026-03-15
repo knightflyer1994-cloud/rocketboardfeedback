@@ -285,7 +285,6 @@ export default function FeedbackFlow() {
     toast.promise(
       supabase.functions.invoke('send-email', {
         body: {
-          to: 'admin-alert-fallback@rocketboard.ai',
           subject: `🚨 DEMO REQUEST: ${report?.keyThemes.role || 'Participant'}`,
           html: `
             <div style="font-family:sans-serif;background:#0f172a;color:#f8fafc;padding:40px;border-radius:12px;border:1px solid #1e293b;">
