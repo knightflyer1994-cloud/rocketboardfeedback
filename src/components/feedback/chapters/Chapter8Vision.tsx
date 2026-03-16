@@ -5,115 +5,176 @@ import { motion } from 'framer-motion';
 const FEATURES = [
   {
     title: 'Zero-Hallucination AI',
-    desc: '4-stage pipeline with claim-level verification and server-side code hydration.',
+    desc: 'Claim-level verification engine that forbids AI from inventing code.',
     icon: '🧠',
     color: 'bg-emerald-500/10 text-emerald-500',
-    span: 'col-span-2',
+    span: 'md:col-span-2',
+    details: '4-Stage Pipeline: Structural Enforcement → Claims Audit → Server Hydration → Citation Mapping.'
   },
   {
     title: 'AST-Aware Search',
-    desc: 'Hybrid retrieval using pgvector, full-text, and tree-sitter tags.',
+    desc: 'Hybrid retrieval using pgvector and tree-sitter tags.',
     icon: '🔍',
     color: 'bg-blue-500/10 text-blue-500',
-    span: 'col-span-1',
+    span: 'md:col-span-1',
   },
   {
-    title: 'Grounded Citations',
-    desc: 'Interactive badges with hover previews and source file explorer.',
-    icon: '🎯',
-    color: 'bg-purple-500/10 text-purple-500',
-    span: 'col-span-1',
+    title: '13+ Connectors',
+    desc: 'Ingest from GitHub, Confluence, Notion, Slack, Jira, and more.',
+    icon: '📦',
+    color: 'bg-indigo-500/10 text-indigo-500',
+    span: 'md:col-span-1',
   },
   {
     title: 'Auto-Remediation',
-    desc: 'AI detects repo changes via webhooks and repairs stale content automatically.',
+    desc: 'AI detects repo changes and repairs stale content.',
     icon: '🔄',
     color: 'bg-orange-500/10 text-orange-500',
-    span: 'col-span-1',
+    span: 'md:col-span-1',
   },
   {
     title: '14 AI Task Types',
-    desc: 'From module planners to "Ask Your Lead" curated 1:1 question banks.',
+    desc: 'From Q&A to curated 1:1 question banks.',
     icon: '⚡',
     color: 'bg-pink-500/10 text-pink-500',
-    span: 'col-span-1',
-  },
-  {
-    title: 'BYOK Security',
-    desc: 'Bring your own API keys with AES-256 pgcrypto encryption.',
-    icon: '🔒',
-    color: 'bg-indigo-500/10 text-indigo-500',
-    span: 'col-span-1 border-indigo-500/20',
+    span: 'md:col-span-1',
   },
 ];
 
+const TARGET_AUDIENCE = [
+  { label: 'Engineering Leads', desc: 'Stop being the onboarding bottleneck.', icon: '👑' },
+  { label: 'Growing Teams', desc: 'Ship guides before day one.', icon: '📈' },
+  { label: 'OSS Maintainers', desc: 'Help contributors understand fast.', icon: '🌐' },
+];
+
 export function Chapter8Vision() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
     <ChapterShell
       title="The RocketBoard Vision"
-      subtitle="AI-native developer onboarding that is actually grounded in your code."
+      subtitle="The Zero-Hallucination Engine for Engineering Teams."
     >
-      <div className="space-y-8">
-        {/* Hero Concept */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 p-8 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary border border-primary/20 flex flex-col justify-center">
-            <h3 className="text-3xl font-heading font-bold text-foreground mb-4">
-              Codebase-Native Intelligence
+      <motion.div 
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="space-y-10 py-4"
+      >
+        {/* HERO CARD */}
+        <motion.div 
+          variants={item}
+          className="relative group overflow-hidden rounded-[2.5rem] border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-secondary/30 p-8 md:p-12"
+        >
+          {/* Decorative Background Elements */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] group-hover:bg-primary/20 transition-colors" />
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-accent/5 rounded-full blur-[80px]" />
+          
+          <div className="relative z-10 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              Next-Gen Onboarding
+            </div>
+            <h3 className="text-4xl md:text-5xl font-heading font-bold text-foreground leading-[1.1] mb-6">
+              Turn your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">codebase</span> into a self-teaching organism.
             </h3>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              RocketBoard ingests your GitHub repos, Confluence, and Notion pages to generate 
-              structured learning modules and interactive glossaries that stay fresh automatically.
+              RocketBoard ingests your repos, docs, and chats to generate evidence-grounded 
+              learning paths that stay fresh as your code evolves.
             </p>
           </div>
-          <div className="p-8 rounded-3xl bg-secondary border border-border flex items-center justify-center">
-            <div className="text-center">
-              <span className="text-5xl mb-4 block">📦</span>
-              <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-widest">
-                13+ Connectors
-              </span>
-            </div>
-          </div>
-        </div>
+        </motion.div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[160px]">
+        {/* BENTO GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {FEATURES.map((f, i) => (
             <motion.div
               key={f.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`p-6 rounded-3xl border border-border bg-card hover:border-primary/30 transition-all flex flex-col justify-between group ${f.span}`}
+              variants={item}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className={`p-8 rounded-[2rem] border border-border bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all flex flex-col justify-between group h-full shadow-sm hover:shadow-glow-primary/5 ${f.span}`}
             >
-              <div className="flex items-start justify-between">
-                <div className={`w-10 h-10 rounded-xl ${f.color} flex items-center justify-center text-xl`}>
+              <div>
+                <div className={`w-14 h-14 rounded-2xl ${f.color} flex items-center justify-center text-3xl mb-8 shadow-sm`}>
                   {f.icon}
                 </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-primary">✨</span>
-                </div>
+                <h4 className="text-xl font-heading font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                  {f.title}
+                </h4>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                  {f.desc}
+                </p>
+                {f.details && (
+                  <div className="pt-4 mt-4 border-t border-border/50">
+                    <p className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider mb-2">Technical Moat</p>
+                    <p className="text-xs text-secondary-foreground italic">{f.details}</p>
+                  </div>
+                )}
               </div>
-              <div>
-                <h4 className="font-heading font-semibold text-foreground mb-1">{f.title}</h4>
-                <p className="text-xs text-muted-foreground leading-snug">{f.desc}</p>
+              <div className="mt-6 flex items-center justify-end">
+                <div className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                  <span className="text-primary text-xs">→</span>
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Deployment Section */}
-        <div className="p-6 rounded-3xl bg-primary/5 border border-dashed border-primary/30 flex items-center justify-between gap-6">
-          <div className="flex-1">
-            <h4 className="text-sm font-heading font-bold text-primary uppercase tracking-wider mb-2">Multi-Tenant Engineering</h4>
-            <p className="text-sm text-muted-foreground italic">"Deploy to your infrastructure with BYOK or use our managed cloud with full RLS security."</p>
-          </div>
-          <div className="hidden sm:flex items-center gap-3">
-            {['GitHub', 'Notion', 'Slack'].map(l => (
-              <span key={l} className="px-3 py-1 rounded-full bg-secondary border border-border text-[10px] font-medium">{l}</span>
-            ))}
-          </div>
+        {/* TARGET AUDIENCE - Built for you */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {TARGET_AUDIENCE.map((t, i) => (
+            <motion.div
+              key={t.label}
+              variants={item}
+              className="p-6 rounded-2xl bg-secondary/30 border border-border/50 flex items-center gap-4 group hover:bg-secondary/50 transition-colors"
+            >
+              <div className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                {t.icon}
+              </div>
+              <div>
+                <h5 className="font-heading font-bold text-sm text-foreground">{t.label}</h5>
+                <p className="text-xs text-muted-foreground">{t.desc}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </div>
+
+        {/* FOOTER CALLOUT */}
+        <motion.div 
+          variants={item}
+          className="p-1 px-1 rounded-[2rem] bg-gradient-to-r from-primary/30 via-accent/30 to-primary/30"
+        >
+          <div className="bg-card rounded-[1.9rem] p-8 flex flex-col md:flex-row items-center justify-between gap-8 border border-white/5">
+            <div className="max-w-md">
+              <h4 className="text-xl font-heading font-bold text-foreground mb-2">BYOK Security First</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Connect your own API keys (OpenAI, Anthropic, Gemini) with zero-knowledge AES-256 encryption. Your data never leaves your infrastructure unless you want it to.
+              </p>
+            </div>
+            <div className="flex gap-2 flex-wrap justify-center">
+              {['SOC2 Ready', 'AES-256', 'RLS Hardened'].map(tag => (
+                <span key={tag} className="px-4 py-2 rounded-full bg-secondary border border-border text-[10px] font-bold uppercase tracking-widest text-primary">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
     </ChapterShell>
   );
 }
