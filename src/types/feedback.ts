@@ -19,6 +19,13 @@ export interface AllAnswers {
   [chapter: number]: ChapterAnswers;
 }
 
+export interface Chapter10Answers extends ChapterAnswers {
+  anything_else?: string;
+  follow_up_consent?: boolean;
+  contact_name?: string;
+  contact_email?: string;
+}
+
 export interface InsightReport {
   topBottlenecks: string[];
   knowledgeConcentration: string[];

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import type { SessionData, AllAnswers, InsightReport, FlowMode } from '@/types/feedback';
 
 export function useFeedbackSession() {
@@ -48,12 +48,12 @@ export function useFeedbackSession() {
     try {
       await supabase
         .from('feedback_answers')
-        .upsert({
+        .insert({
           session_id: sessionId,
           chapter,
           question_key: questionKey,
-          answer: { value },
-        }, { onConflict: 'session_id,chapter,question_key' });
+          answer: { value: value as any },
+        });
     } catch (e) {
       console.error('Error saving answer:', e);
     }
@@ -66,10 +66,9 @@ export function useFeedbackSession() {
     setSession(prev => prev ? { ...prev, ...updates } : prev);
     try {
       const { mode: _mode, id: _id, ...dbUpdates } = updates as SessionData;
-      await supabase
-        .from('feedback_sessions')
-        .update(dbUpdates)
-        .eq('id', sessionId);
+      // NOTE: Update is now restricted for anon. We will skip this update on the client
+      // or handle via session summary at the end.
+      console.log('Session metadata update requested (skipping due to RLS lockdown):', updates);
     } catch (e) {
       console.error('Error updating session:', e);
     }
@@ -79,7 +78,7 @@ export function useFeedbackSession() {
     try {
       await supabase
         .from('feedback_summary')
-        .upsert({
+        .insert({
           session_id: sessionId,
           top_bottlenecks: report.topBottlenecks,
           knowledge_concentration: report.knowledgeConcentration,
@@ -87,12 +86,10 @@ export function useFeedbackSession() {
           vision_score: report.visionScore,
           friction_score: report.frictionScore,
           key_themes: report.keyThemes,
-        }, { onConflict: 'session_id' });
+        });
 
-      await supabase
-        .from('feedback_sessions')
-        .update({ completed: true })
-        .eq('id', sessionId);
+      // Note: We don't update sessions table to 'completed' anymore from client
+      // because we've removed UPDATE permissions for security.
     } catch (e) {
       console.error('Error saving summary:', e);
     }
@@ -102,6 +99,21 @@ export function useFeedbackSession() {
     return answers[chapter]?.[key];
   }, [answers]);
 
+  const saveContacts = useCallback(async (sessionId: string, data: { consent: boolean; name?: string; email?: string }) => {
+    try {
+      await (supabase as any)
+        .from('feedback_contacts')
+        .insert({
+          session_id: sessionId,
+          consent: data.consent,
+          contact_name: data.name,
+          contact_email: data.email,
+        });
+    } catch (e) {
+      console.error('Error saving contacts:', e);
+    }
+  }, []);
+
   return {
     session,
     answers,
@@ -110,6 +122,7 @@ export function useFeedbackSession() {
     saveAnswer,
     updateSession,
     saveSummary,
+    saveContacts,
     getAnswer,
     setSession,
   };

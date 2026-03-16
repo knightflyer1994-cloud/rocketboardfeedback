@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { ProgressBar } from '@/components/feedback/ProgressBar';
 import { Chapter1Snapshot } from '@/components/feedback/chapters/Chapter1Snapshot';
 import { Chapter2Reality } from '@/components/feedback/chapters/Chapter2Reality';
@@ -14,7 +14,7 @@ import { Chapter9Adoption } from '@/components/feedback/chapters/Chapter9Adoptio
 import { Chapter10Closing } from '@/components/feedback/chapters/Chapter10Closing';
 import { InsightReport } from '@/components/feedback/InsightReport';
 import { useFeedbackSession } from '@/hooks/useFeedbackSession';
-import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers } from '@/types/feedback';
+import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers, Chapter10Answers } from '@/types/feedback';
 import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { cn } from '@/lib/utils';
 
@@ -214,7 +214,7 @@ export default function FeedbackFlow() {
   const [currentChapter, setCurrentChapter] = useState(1);
   const [report, setReport] = useState<InsightReportType | null>(null);
 
-  const { session, answers, createSession, saveAnswer, updateSession, saveSummary } = useFeedbackSession();
+  const { session, answers, createSession, saveAnswer, updateSession, saveSummary, saveContacts } = useFeedbackSession();
 
   const chapters = mode === 'deep' ? CHAPTERS_DEEP : mode === 'fast' ? CHAPTERS_FAST : CHAPTERS_EXECUTIVE;
 
@@ -252,9 +252,19 @@ export default function FeedbackFlow() {
 
   const handleComplete = async () => {
     const computed = computeReport(answers);
+    const ch10 = (answers[10] || {}) as Chapter10Answers;
+
     if (session) {
       await saveSummary(session.id, computed);
       
+      if (ch10.follow_up_consent !== undefined) {
+        await saveContacts(session.id, {
+          consent: ch10.follow_up_consent,
+          name: ch10.contact_name,
+          email: ch10.contact_email,
+        });
+      }
+
       // Trigger real-time admin notification
       try {
         const { buildReportEmail } = await import('@/lib/email-templates');
@@ -370,7 +380,8 @@ export default function FeedbackFlow() {
             </span>
             <button
               onClick={handleNext}
-              className="px-6 py-2.5 rounded-xl gradient-button text-primary-foreground text-sm font-heading font-semibold shadow-glow-primary hover:shadow-glow-accent transition-all"
+              disabled={currentChapter === 2 && Object.values((answers[2] || {})['timeline'] as Record<string, number> || {}).reduce((a, b) => a + b, 0) !== 100}
+              className="px-6 py-2.5 rounded-xl gradient-button text-primary-foreground text-sm font-heading font-semibold shadow-glow-primary hover:shadow-glow-accent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue →
             </button>
