@@ -92,6 +92,18 @@ export function Chapter5Integrations({ answers, onChange }: Props) {
         ))}
       </div>
 
+      {/* Other systems */}
+      <div className="space-y-4 p-5 rounded-xl bg-secondary/50 border border-border">
+        <TextAreaField
+          label="Are you using any other systems not listed above? (e.g. custom internal tools)"
+          value={(answers.other_integrations as string) || ''}
+          onChange={v => onChange('other_integrations', v)}
+          placeholder="e.g. Custom internal tool, Bitbucket, Datadog..."
+          rows={2}
+          hint="List any other critical platforms we missed."
+        />
+      </div>
+
       {/* Top 5 ranked */}
       {selectedIntegrations.length > 0 && (
         <div className="space-y-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
