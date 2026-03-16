@@ -172,6 +172,16 @@ Deno.serve(async (req) => {
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const FUNCTION_SECRET = Deno.env.get('WEEKLY_DIGEST_SECRET');
+
+    // Simple auth guard: require a secret if it's configured
+    const authHeader = req.headers.get('Authorization');
+    if (FUNCTION_SECRET && authHeader !== `Bearer ${FUNCTION_SECRET}`) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!RESEND_API_KEY || !ADMIN_EMAIL || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Missing required environment variables');

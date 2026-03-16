@@ -115,7 +115,7 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
           )}
         </button>
         <p className="text-xs text-muted-foreground text-center mt-3">
-          Your responses are confidential and will only be used in aggregate to inform product direction.
+          Responses are secure. Personal data is isolated and used only to deliver your custom report.
         </p>
       </div>
     </ChapterShell>

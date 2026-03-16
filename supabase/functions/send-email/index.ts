@@ -33,12 +33,13 @@ Deno.serve(async (req) => {
     const { to, subject, html, attachments, from, is_admin_alert } = payload;
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
     const FUNCTION_SECRET = Deno.env.get('SEND_EMAIL_SECRET');
-
-    // Simple auth guard: require a secret if it's configured
     const authHeader = req.headers.get('Authorization');
-    if (FUNCTION_SECRET && authHeader !== `Bearer ${FUNCTION_SECRET}`) {
+
+    // SECURITY: Disallow arbitrary 'to' addresses from public (unauthenticated) calls.
+    // If it's NOT an admin alert, we MUST have a valid FUNCTION_SECRET.
+    if (!is_admin_alert && (!FUNCTION_SECRET || authHeader !== `Bearer ${FUNCTION_SECRET}`)) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Unauthorized: Arbitrary relay requires secret. Use is_admin_alert for public calls.' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -47,6 +48,8 @@ Deno.serve(async (req) => {
     const missing = [];
     if (!subject) missing.push('subject');
     if (!html) missing.push('html');
+    
+    // If it's an admin alert, we use ADMIN_EMAIL. If not, we need 'to' (and we already checked auth above).
     if (!is_admin_alert && !to) missing.push('to');
 
     if (missing.length > 0) {

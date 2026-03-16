@@ -107,7 +107,7 @@ export function buildReportEmail(report: InsightReportType, answers: AllAnswers)
 
     <!-- Footer -->
     <div style="text-align:center;border-top:1px solid #1f2937;padding-top:20px;">
-      <p style="color:#374151;font-size:11px;margin:0;">Engineering Onboarding Insights · Confidential Report</p>
+      <p style="color:#374151;font-size:11px;margin:0;">Engineering Onboarding Insights · Research Report</p>
       <p style="color:#374151;font-size:10px;margin:4px 0 0;">Generated ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
     </div>
 
