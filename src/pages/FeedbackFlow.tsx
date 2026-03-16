@@ -204,6 +204,13 @@ function computeReport(answers: Record<number, ChapterAnswers>): InsightReportTy
       companySize: ch1.company_size_eng ? `${ch1.company_size_eng} engineers` : undefined,
       workMode: ch1.work_mode as string,
       productivityMetrics: ch2.productivity_metrics as string[],
+      openText: (answers[10] || {}).anything_else as string,
+      accessStory: (answers[4] || {}).access_text as string,
+      redlineSources: (answers[5] || {}).redline_sources as string,
+      aiGovernance: (answers[5] || {}).ai_governance as string,
+      otherIntegrations: (answers[5] || {}).other_integrations as string,
+      postMonth1: (answers[6] || {}).post_month1 as string,
+      cultureVision: (answers[2] || {}).culture_text as string,
     },
   };
 }

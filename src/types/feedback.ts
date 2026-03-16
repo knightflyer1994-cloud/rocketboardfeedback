@@ -39,6 +39,12 @@ export interface InsightReport {
     productivityMetrics?: string[];
     timelineIssues?: string[];
     openText?: string;
+    accessStory?: string;
+    redlineSources?: string;
+    aiGovernance?: string;
+    otherIntegrations?: string;
+    postMonth1?: string;
+    cultureVision?: string;
   };
 }
 
