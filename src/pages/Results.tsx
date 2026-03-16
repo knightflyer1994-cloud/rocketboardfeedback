@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { InsightReport } from '@/components/feedback/InsightReport';
 import { ChapterAnswers, InsightReport as InsightReportType, AllAnswers } from '@/types/feedback';
 import { ChevronLeft, Download, ExternalLink, Filter, Search, Trash2 } from 'lucide-react';
