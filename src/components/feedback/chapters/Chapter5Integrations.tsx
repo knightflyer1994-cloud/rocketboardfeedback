@@ -87,6 +87,15 @@ export function Chapter5Integrations({ answers, onChange }: Props) {
                   )}
                 </div>
               ))}
+              <div className="flex-1 min-w-[120px]">
+                <input
+                  type="text"
+                  placeholder={`Other ${cat}...`}
+                  value={(answers[`other_${cat}`] as string) || ''}
+                  onChange={e => onChange(`other_${cat}`, e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-card/50 text-sm italic placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/30 transition-all font-sans"
+                />
+              </div>
             </div>
           </div>
         ))}

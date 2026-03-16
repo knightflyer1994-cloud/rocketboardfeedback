@@ -282,6 +282,17 @@ export function useExportFeedback() {
       renderInsight('Access & Onboarding Friction', themes.accessStory);
       renderInsight('Culture & Human Connection', themes.cultureVision);
       renderInsight('Other Critical Systems', themes.otherIntegrations);
+      
+      // Combine per-category others
+      const perCategoryOthers = Object.entries(answers[5] || {})
+        .filter(([k, v]) => k.startsWith('other_') && k !== 'other_integrations' && v && String(v).trim().length > 0)
+        .map(([k, v]) => `${k.replace('other_', '')}: ${v}`)
+        .join('; ');
+      
+      if (perCategoryOthers) {
+        renderInsight('Specific Category Additions', perCategoryOthers);
+      }
+
       renderInsight('Governance & Red-Lines', themes.redlineSources);
       renderInsight('AI Security & Policy', themes.aiGovernance);
       renderInsight('Long-term Platform Value', themes.postMonth1);
