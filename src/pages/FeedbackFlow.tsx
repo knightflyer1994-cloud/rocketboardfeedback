@@ -170,7 +170,7 @@ function computeReport(answers: Record<number, ChapterAnswers>): InsightReportTy
   const ch3 = answers[3] || {};
   const ch4 = answers[4] || {};
   const ch5 = answers[5] || {};
-  const ch8 = answers[8] || {};
+  const ch11 = answers[11] || {};
 
   const impacts = (ch3.impacts as Record<string, number>) || {};
   const impactValues = Object.values(impacts);
@@ -192,7 +192,7 @@ function computeReport(answers: Record<number, ChapterAnswers>): InsightReportTy
   const knowledgeConcentration = staleSources.length > 0 ? staleSources : (ch4.knowledge_sources as string[] || []).slice(0, 3);
 
   const mustHaveIntegrations = (ch5.ranked_integrations as string[]) || (ch5.selected_integrations as string[] || []).slice(0, 5);
-  const visionScore = (ch8.vision_score as number) || 7;
+  const visionScore = (ch11.vision_score as number) || 7;
 
   return {
     topBottlenecks,
