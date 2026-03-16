@@ -380,7 +380,11 @@ export default function FeedbackFlow() {
             </span>
             <button
               onClick={handleNext}
-              disabled={currentChapter === 2 && Object.values((answers[2] || {})['timeline'] as Record<string, number> || {}).reduce((a, b) => a + b, 0) !== 100}
+              disabled={currentChapter === 2 && (() => {
+                const timeline = (answers[2] || {})['timeline'] as Record<string, number> | undefined;
+                if (!timeline) return false; // Allowed (defaults to 100%)
+                return Object.values(timeline).reduce((a, b) => a + b, 0) !== 100;
+              })()}
               className="px-6 py-2.5 rounded-xl gradient-button text-primary-foreground text-sm font-heading font-semibold shadow-glow-primary hover:shadow-glow-accent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue →
