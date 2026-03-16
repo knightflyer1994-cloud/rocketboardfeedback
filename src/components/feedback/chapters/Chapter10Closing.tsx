@@ -12,8 +12,18 @@ interface Props {
 export function Chapter10Closing({ answers, onChange, onComplete, saving }: Props) {
   const anythingElse = (answers.anything_else as string) || '';
   const followUpConsent = answers.follow_up_consent as boolean | undefined;
-  const contactEmail = (answers.contact_email as string) || '';
-  const contactName = (answers.contact_name as string) || '';
+  
+  // Use local state for PII to prevent it from being written to the answers table via global onChange
+  const [contactName, setContactName] = React.useState((answers.contact_name as string) || '');
+  const [contactEmail, setContactEmail] = React.useState((answers.contact_email as string) || '');
+
+  const handleComplete = () => {
+    // We pass the local PII state back only at the final step
+    (onComplete as any)({
+      name: contactName,
+      email: contactEmail
+    });
+  };
 
   return (
     <ChapterShell
@@ -68,7 +78,7 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
                 <input
                   type="text"
                   value={contactName}
-                  onChange={e => onChange('contact_name', e.target.value)}
+                  onChange={e => setContactName(e.target.value)}
                   placeholder="Jane Smith"
                   className="w-full px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                 />
@@ -78,7 +88,7 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
                 <input
                   type="email"
                   value={contactEmail}
-                  onChange={e => onChange('contact_email', e.target.value)}
+                  onChange={e => setContactEmail(e.target.value)}
                   placeholder="jane@company.com"
                   className="w-full px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                 />
@@ -91,7 +101,7 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
       {/* Submit */}
       <div className="pt-4">
         <button
-          onClick={onComplete}
+          onClick={handleComplete}
           disabled={saving}
           className="w-full py-4 rounded-xl gradient-button text-primary-foreground font-heading font-bold text-lg shadow-glow-primary hover:shadow-glow-accent transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed animate-pulse-glow"
         >

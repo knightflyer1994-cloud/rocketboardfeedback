@@ -32,6 +32,16 @@ Deno.serve(async (req) => {
     const payload: EmailPayload = await req.json();
     const { to, subject, html, attachments, from, is_admin_alert } = payload;
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
+    const FUNCTION_SECRET = Deno.env.get('SEND_EMAIL_SECRET');
+
+    // Simple auth guard: require a secret if it's configured
+    const authHeader = req.headers.get('Authorization');
+    if (FUNCTION_SECRET && authHeader !== `Bearer ${FUNCTION_SECRET}`) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Granular validation
     const missing = [];
@@ -41,23 +51,25 @@ Deno.serve(async (req) => {
 
     if (missing.length > 0) {
       return new Response(
-        JSON.stringify({ error: `Missing required fields: ${missing.join(', ')}`, received_payload: { subject: !!subject, html: !!html, to: !!to, is_admin_alert: !!is_admin_alert } }),
+        JSON.stringify({ error: `Missing required fields: ${missing.join(', ')}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (is_admin_alert && !ADMIN_EMAIL) {
       return new Response(
-        JSON.stringify({ error: 'ADMIN_EMAIL is not configured in environment variables' }),
+        JSON.stringify({ error: 'ADMIN_EMAIL is not configured' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // SECURITY: Enforce that admin alerts ONLY go to the hardcoded admin email
     const targetRecipient = is_admin_alert ? ADMIN_EMAIL : to;
-    console.log(`[send-email] Attempting to send ${is_admin_alert ? 'ADMIN ALERT' : 'standard email'} to: ${targetRecipient}`);
+    
+    console.log(`[send-email] Sending to: ${targetRecipient} (Admin: ${is_admin_alert})`);
 
     const emailBody: Record<string, unknown> = {
-      from: from || 'Onboarding Insights <reports@resend.dev>',
+      from: from || 'Rocketboard Feedback <reports@resend.dev>',
       to: [targetRecipient],
       subject: subject || 'New Insight Report',
       html,

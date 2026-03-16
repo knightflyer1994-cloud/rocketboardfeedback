@@ -51,7 +51,7 @@ function WelcomeScreen({ onStart }: { onStart: () => void }) {
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-2 pt-2 border-t border-white/5">
             <span className="text-score-low">🔒</span>
-            Responses are fully confidential and used only in aggregate to guide product direction.
+            Responses are secure. Personal data is isolated and used only to deliver your custom report.
           </p>
         </div>
 
@@ -250,7 +250,7 @@ export default function FeedbackFlow() {
     }
   };
 
-  const handleComplete = async () => {
+  const handleComplete = async (piiData?: { name: string; email: string }) => {
     const computed = computeReport(answers);
     const ch10 = (answers[10] || {}) as Chapter10Answers;
 
@@ -260,8 +260,8 @@ export default function FeedbackFlow() {
       if (ch10.follow_up_consent !== undefined) {
         await saveContacts(session.id, {
           consent: ch10.follow_up_consent,
-          name: ch10.contact_name,
-          email: ch10.contact_email,
+          name: piiData?.name,
+          email: piiData?.email,
         });
       }
 

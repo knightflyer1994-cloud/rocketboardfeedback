@@ -9,20 +9,21 @@ export function useFeedbackSession() {
 
   const createSession = useCallback(async (mode: FlowMode) => {
     setSaving(true);
+    const sessionId = crypto.randomUUID();
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('feedback_sessions')
-        .insert({ mode, completed: false })
-        .select()
-        .single();
+        .insert({ id: sessionId, mode, completed: false });
+      
       if (error) throw error;
-      const newSession: SessionData = { id: data.id, mode };
+      
+      const newSession: SessionData = { id: sessionId, mode };
       setSession(newSession);
       return newSession;
     } catch (e) {
       console.error('Error creating session:', e);
-      // Create local fallback
-      const localSession: SessionData = { id: crypto.randomUUID(), mode };
+      // Fallback to local-only session if DB insert fails
+      const localSession: SessionData = { id: sessionId, mode };
       setSession(localSession);
       return localSession;
     } finally {
