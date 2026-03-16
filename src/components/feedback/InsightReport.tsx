@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { InsightReport as InsightReportType, AllAnswers } from '@/types/feedback';
 import { BOTTLENECK_CARDS, KNOWLEDGE_SOURCES, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { useExportFeedback } from '@/hooks/useExportFeedback';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Download, Mail, Loader2 } from 'lucide-react';
 

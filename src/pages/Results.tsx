@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { InsightReport } from '@/components/feedback/InsightReport';
 import { ChapterAnswers, InsightReport as InsightReportType, AllAnswers } from '@/types/feedback';
 import { ChevronLeft, Download, ExternalLink, Filter, Search, Trash2 } from 'lucide-react';
@@ -39,7 +39,7 @@ export default function Results() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setSubmissions(sessions || []);
+      setSubmissions((sessions || []) as any);
     } catch (error) {
       console.error('Error fetching submissions:', error);
       toast.error('Failed to load submissions');
@@ -61,7 +61,7 @@ export default function Results() {
       answers.forEach(a => {
         formattedAnswers[a.chapter] = {
           ...(formattedAnswers[a.chapter] || {}),
-          [a.question_key]: a.answer.value
+          [a.question_key]: (a.answer as any)?.value
         };
       });
 
