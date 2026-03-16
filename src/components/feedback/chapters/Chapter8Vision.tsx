@@ -1,176 +1,119 @@
 import React from 'react';
-import { ChapterShell, SelectCard, SliderField, TextAreaField } from '../FeedbackWidgets';
-import type { ChapterAnswers } from '@/types/feedback';
+import { ChapterShell } from '../FeedbackWidgets';
+import { motion } from 'framer-motion';
 
-const VISION_TEXT = `We're building an AI-powered platform that connects to a company's existing knowledge sources (docs, code repos, chats, wikis), automatically organizes and keeps that knowledge fresh, creates personalized onboarding experiences and learning paths for new engineers, and provides grounded AI assistance so new hires can ask questions and get accurate answers based on the company's own data.`;
-
-const EXCITEMENT_CARDS = [
-  { id: 'time_savings', label: 'Massive time savings', icon: '⏱️' },
-  { id: 'fresh_knowledge', label: 'Always-fresh knowledge', icon: '🌿' },
-  { id: 'personalization', label: 'Personalized paths', icon: '🗺️' },
-  { id: 'ai_qa', label: 'Grounded AI Q&A', icon: '🤖' },
-  { id: 'analytics', label: 'Onboarding analytics', icon: '📊' },
-  { id: 'mentor_scale', label: 'Scales mentorship', icon: '📈' },
+const FEATURES = [
+  {
+    title: 'Zero-Hallucination AI',
+    desc: '4-stage pipeline with claim-level verification and server-side code hydration.',
+    icon: '🧠',
+    color: 'bg-emerald-500/10 text-emerald-500',
+    span: 'col-span-2',
+  },
+  {
+    title: 'AST-Aware Search',
+    desc: 'Hybrid retrieval using pgvector, full-text, and tree-sitter tags.',
+    icon: '🔍',
+    color: 'bg-blue-500/10 text-blue-500',
+    span: 'col-span-1',
+  },
+  {
+    title: 'Grounded Citations',
+    desc: 'Interactive badges with hover previews and source file explorer.',
+    icon: '🎯',
+    color: 'bg-purple-500/10 text-purple-500',
+    span: 'col-span-1',
+  },
+  {
+    title: 'Auto-Remediation',
+    desc: 'AI detects repo changes via webhooks and repairs stale content automatically.',
+    icon: '🔄',
+    color: 'bg-orange-500/10 text-orange-500',
+    span: 'col-span-1',
+  },
+  {
+    title: '14 AI Task Types',
+    desc: 'From module planners to "Ask Your Lead" curated 1:1 question banks.',
+    icon: '⚡',
+    color: 'bg-pink-500/10 text-pink-500',
+    span: 'col-span-1',
+  },
+  {
+    title: 'BYOK Security',
+    desc: 'Bring your own API keys with AES-256 pgcrypto encryption.',
+    icon: '🔒',
+    color: 'bg-indigo-500/10 text-indigo-500',
+    span: 'col-span-1 border-indigo-500/20',
+  },
 ];
 
-const CONCERN_CARDS = [
-  { id: 'data_privacy', label: 'Data privacy', icon: '🔒' },
-  { id: 'ai_accuracy', label: 'AI accuracy / hallucinations', icon: '⚠️' },
-  { id: 'adoption', label: 'Team adoption', icon: '😴' },
-  { id: 'cost', label: 'Cost / ROI', icon: '💰' },
-  { id: 'setup', label: 'Setup complexity', icon: '🔧' },
-  { id: 'vendor_lock', label: 'Vendor lock-in', icon: '🔗' },
-  { id: 'replaces_culture', label: 'Replaces human culture', icon: '🧑‍🤝‍🧑' },
-];
-
-interface Props {
-  answers: ChapterAnswers;
-  onChange: (key: string, value: unknown) => void;
-  mode?: 'fast' | 'deep' | 'executive';
-}
-
-export function Chapter8Vision({ answers, onChange, mode }: Props) {
-  const visionScore = (answers.vision_score as number) || 7;
-  const excitements = (answers.excitements as string[]) || [];
-  const concerns = (answers.concerns as string[]) || [];
-  const missingText = (answers.missing_text as string) || '';
-  const dealBreakers = (answers.deal_breakers as string) || '';
-  const requireCitations = (answers.require_citations as number) || 8;
-  const humanReview = (answers.human_review as number) || 7;
-  const showSources = (answers.show_sources as number) || 8;
-
-  const toggleExcitement = (id: string) => {
-    const next = excitements.includes(id) ? excitements.filter(x => x !== id) : [...excitements, id];
-    onChange('excitements', next);
-  };
-
-  const toggleConcern = (id: string) => {
-    const next = concerns.includes(id) ? concerns.filter(x => x !== id) : [...concerns, id];
-    onChange('concerns', next);
-  };
-
+export function Chapter8Vision() {
   return (
     <ChapterShell
-      title="Vision reaction"
-      subtitle="We want your unfiltered take on what we're building."
+      title="The RocketBoard Vision"
+      subtitle="AI-native developer onboarding that is actually grounded in your code."
     >
-      {/* Vision block */}
-      <div className="p-5 rounded-xl border border-primary/20 bg-primary/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1 h-full gradient-progress" />
-        <p className="text-sm text-muted-foreground leading-relaxed pl-3 italic">
-          "{VISION_TEXT}"
-        </p>
-      </div>
-
-      {/* ROI question — Executive only */}
-      {mode === 'executive' && (
-        <div className="p-5 rounded-xl bg-accent/10 border border-accent/20">
-          <SliderField
-            label="What is the potential ROI or strategic value of solving engineering ramp-up?"
-            value={(answers.roi_value as number) || 7}
-            onChange={v => onChange('roi_value', v)}
-            leftLabel="Marginal / Nice-to-have"
-            rightLabel="Strategic / Bottom-line impact"
-            description="How much do you value solving this problem from a business perspective?"
-          />
+      <div className="space-y-8">
+        {/* Hero Concept */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 p-8 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary border border-primary/20 flex flex-col justify-center">
+            <h3 className="text-3xl font-heading font-bold text-foreground mb-4">
+              Codebase-Native Intelligence
+            </h3>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              RocketBoard ingests your GitHub repos, Confluence, and Notion pages to generate 
+              structured learning modules and interactive glossaries that stay fresh automatically.
+            </p>
+          </div>
+          <div className="p-8 rounded-3xl bg-secondary border border-border flex items-center justify-center">
+            <div className="text-center">
+              <span className="text-5xl mb-4 block">📦</span>
+              <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-widest">
+                13+ Connectors
+              </span>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Vision score */}
-      <div className="p-5 rounded-xl bg-secondary/50 border border-border">
-        <SliderField
-          label="How well does this vision address the onboarding challenges you experience?"
-          value={visionScore}
-          onChange={v => onChange('vision_score', v)}
-          leftLabel="Misses the mark"
-          rightLabel="Exactly what we need"
-          colorByValue
-          description="Be honest — a low score is more valuable than a polite high one."
-        />
-      </div>
-
-      {/* Excitement cards */}
-      <div className="space-y-3">
-        <h3 className="text-base font-heading font-semibold text-foreground">
-          What excites you most? <span className="text-muted-foreground font-normal">(pick all that apply)</span>
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {EXCITEMENT_CARDS.map(c => (
-            <SelectCard
-              key={c.id}
-              icon={c.icon}
-              label={c.label}
-              size="sm"
-              selected={excitements.includes(c.id)}
-              onClick={() => toggleExcitement(c.id)}
-            />
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[160px]">
+          {FEATURES.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={`p-6 rounded-3xl border border-border bg-card hover:border-primary/30 transition-all flex flex-col justify-between group ${f.span}`}
+            >
+              <div className="flex items-start justify-between">
+                <div className={`w-10 h-10 rounded-xl ${f.color} flex items-center justify-center text-xl`}>
+                  {f.icon}
+                </div>
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-primary">✨</span>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-heading font-semibold text-foreground mb-1">{f.title}</h4>
+                <p className="text-xs text-muted-foreground leading-snug">{f.desc}</p>
+              </div>
+            </motion.div>
           ))}
         </div>
-      </div>
 
-      {/* Concern cards */}
-      <div className="space-y-3">
-        <h3 className="text-base font-heading font-semibold text-foreground">
-          What concerns you? <span className="text-muted-foreground font-normal">(pick all that apply)</span>
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {CONCERN_CARDS.map(c => (
-            <SelectCard
-              key={c.id}
-              icon={c.icon}
-              label={c.label}
-              size="sm"
-              selected={concerns.includes(c.id)}
-              onClick={() => toggleConcern(c.id)}
-            />
-          ))}
+        {/* Deployment Section */}
+        <div className="p-6 rounded-3xl bg-primary/5 border border-dashed border-primary/30 flex items-center justify-between gap-6">
+          <div className="flex-1">
+            <h4 className="text-sm font-heading font-bold text-primary uppercase tracking-wider mb-2">Multi-Tenant Engineering</h4>
+            <p className="text-sm text-muted-foreground italic">"Deploy to your infrastructure with BYOK or use our managed cloud with full RLS security."</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-3">
+            {['GitHub', 'Notion', 'Slack'].map(l => (
+              <span key={l} className="px-3 py-1 rounded-full bg-secondary border border-border text-[10px] font-medium">{l}</span>
+            ))}
+          </div>
         </div>
       </div>
-
-      {/* AI trust probes */}
-      <div className="space-y-5 p-5 rounded-xl bg-secondary/50 border border-border">
-        <h3 className="text-base font-heading font-semibold text-foreground">AI trust signals</h3>
-        <SliderField
-          label="Require citations / source links for AI-generated answers?"
-          value={requireCitations}
-          onChange={v => onChange('require_citations', v)}
-          leftLabel="Not necessary"
-          rightLabel="Absolutely required"
-        />
-        <SliderField
-          label="Human review layer before AI content is surfaced to new hires?"
-          value={humanReview}
-          onChange={v => onChange('human_review', v)}
-          leftLabel="Fully automated"
-          rightLabel="Always human-reviewed"
-        />
-        <SliderField
-          label="Transparency: show source spans / highlight what the answer is based on?"
-          value={showSources}
-          onChange={v => onChange('show_sources', v)}
-          leftLabel="Clean answer only"
-          rightLabel="Always show evidence"
-        />
-      </div>
-
-      {/* Conditional deeper probe */}
-      {visionScore <= 6 && (
-        <TextAreaField
-          label="What's missing from this vision that would make it more compelling?"
-          value={missingText}
-          onChange={v => onChange('missing_text', v)}
-          placeholder="e.g. You haven't mentioned how to handle legacy tribal knowledge, or the social onboarding aspect..."
-          rows={4}
-        />
-      )}
-
-      <TextAreaField
-        label="Any absolute deal-breakers that would prevent you from adopting this?"
-        value={dealBreakers}
-        onChange={v => onChange('deal_breakers', v)}
-        placeholder="e.g. Must be SOC2 certified, can't use OpenAI, must have on-prem option..."
-        rows={3}
-      />
     </ChapterShell>
   );
 }

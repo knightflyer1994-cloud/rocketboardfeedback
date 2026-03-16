@@ -52,6 +52,7 @@ export const CHAPTERS_EXECUTIVE = [
   { id: 1, label: 'Snapshot' },
   { id: 3, label: 'Challenges' },
   { id: 8, label: 'Vision' },
+  { id: 11, label: 'Vision Reaction' },
   { id: 10, label: 'Closing' },
 ];
 
@@ -63,6 +64,7 @@ export const CHAPTERS_FAST = [
   { id: 5, label: 'Integrations' },
   { id: 6, label: 'Services' },
   { id: 8, label: 'Vision' },
+  { id: 11, label: 'Vision Reaction' },
   { id: 9, label: 'Adoption' },
   { id: 10, label: 'Closing' },
 ];
@@ -76,6 +78,7 @@ export const CHAPTERS_DEEP = [
   { id: 6, label: 'Services' },
   { id: 7, label: 'Competitive' },
   { id: 8, label: 'Vision' },
+  { id: 11, label: 'Vision Reaction' },
   { id: 9, label: 'Adoption' },
   { id: 10, label: 'Closing' },
 ];

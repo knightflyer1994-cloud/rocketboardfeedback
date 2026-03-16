@@ -10,6 +10,7 @@ import { Chapter5Integrations } from '@/components/feedback/chapters/Chapter5Int
 import { Chapter6Services } from '@/components/feedback/chapters/Chapter6Services';
 import { Chapter7Competitive } from '@/components/feedback/chapters/Chapter7Competitive';
 import { Chapter8Vision } from '@/components/feedback/chapters/Chapter8Vision';
+import { Chapter11VisionReaction } from '@/components/feedback/chapters/Chapter11VisionReaction';
 import { Chapter9Adoption } from '@/components/feedback/chapters/Chapter9Adoption';
 import { Chapter10Closing } from '@/components/feedback/chapters/Chapter10Closing';
 import { InsightReport } from '@/components/feedback/InsightReport';
@@ -96,7 +97,7 @@ function ModeSelector({ onSelect }: { onSelect: (mode: FlowMode) => void }) {
               High-level strategic pulse. Focuses on business impact, vision fit, and key organizational challenges. Best for Founders and Directors.
             </p>
             <div className="flex flex-wrap gap-1">
-              {['Snapshot', 'Challenges', 'Vision', 'Closing'].map(t => (
+              {['Snapshot', 'Challenges', 'Vision', 'Vision Reaction', 'Closing'].map(t => (
                 <span key={t} className="px-2 py-0.5 rounded-full bg-accent/10 text-xs text-accent/80">{t}</span>
               ))}
             </div>
@@ -149,7 +150,7 @@ function ModeSelector({ onSelect }: { onSelect: (mode: FlowMode) => void }) {
               Full detailed journey with branching questions, competitive landscape, and richer personalization based on your role.
             </p>
             <div className="flex flex-wrap gap-1">
-              {['Snapshot', 'Reality', 'Bottlenecks', 'Knowledge', 'Integrations', 'Services', 'Competitive', 'Vision', 'Adoption', 'Closing'].map(t => (
+              {['Snapshot', 'Reality', 'Bottlenecks', 'Knowledge', 'Integrations', 'Services', 'Vision', 'Vision Reaction', 'Adoption', 'Closing'].map(t => (
                 <span key={t} className="px-2 py-0.5 rounded-full bg-primary/10 text-xs text-primary/80">{t}</span>
               ))}
             </div>
@@ -341,7 +342,8 @@ export default function FeedbackFlow() {
       case 5: return <Chapter5Integrations answers={chapterAnswers} onChange={handleChange} />;
       case 6: return <Chapter6Services answers={chapterAnswers} onChange={handleChange} />;
       case 7: return <Chapter7Competitive answers={chapterAnswers} onChange={handleChange} />;
-      case 8: return <Chapter8Vision answers={chapterAnswers} onChange={handleChange} mode={mode} />;
+      case 8: return <Chapter8Vision />;
+      case 11: return <Chapter11VisionReaction answers={chapterAnswers} onChange={handleChange} mode={mode} />;
       case 9: return <Chapter9Adoption answers={chapterAnswers} onChange={handleChange} />;
       case 10: return <Chapter10Closing answers={chapterAnswers} onChange={handleChange} onComplete={handleComplete} />;
       default: return null;
