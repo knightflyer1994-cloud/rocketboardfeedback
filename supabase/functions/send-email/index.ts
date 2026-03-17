@@ -118,7 +118,8 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({
             error: 'Resend Sandbox Restriction',
-            message: `Resend is in Sandbox mode. You can ONLY send emails to your authorized account email (kirannreddyaero@gmail.com). Currently trying to send to: ${targetRecipient}. Please update your ADMIN_EMAIL secret to match your Resend account email, or verify a domain at resend.com/domains.`,
+            message: `Resend is in Sandbox mode. You can ONLY send emails to your authorized account email (kirannreddyaero@gmail.com). To send to others (like ${targetRecipient}), you MUST verify a domain at resend.com/domains.`,
+            suggestion: 'Go to resend.com/domains, add your domain, and update the "from" address in this function once verified.',
             details: resendErrorMsg,
           }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

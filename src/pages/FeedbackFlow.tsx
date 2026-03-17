@@ -315,7 +315,7 @@ export default function FeedbackFlow() {
                 <p style="margin:0;"><strong>Report ID:</strong> ${session.id}</p>
               </div>
 
-              <a href="https://ysjhnokgziuaphunmgdh.supabase.co/results" 
+              <a href="${window.location.origin}/results" 
                  style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
                 View Full Insight Report →
               </a>
