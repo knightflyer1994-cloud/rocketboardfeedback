@@ -276,7 +276,7 @@ export default function FeedbackFlow() {
       // Trigger real-time admin notification
       try {
         const { buildReportEmail } = await import('@/lib/email-templates');
-        const html = buildReportEmail(computed, answers);
+        const html = buildReportEmail(computed, answers, piiData);
         
         // Use a background call to send-email edge function
         supabase.functions.invoke('send-email', {

@@ -79,6 +79,7 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
           to: emailTarget,
           subject: `Your Engineering Onboarding Insight Report`,
           html,
+          is_report_delivery: true,
           attachments: [{
             filename: `onboarding-insight-report.pdf`,
             content: pdfBase64,

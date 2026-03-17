@@ -1,7 +1,11 @@
 import type { InsightReport as InsightReportType, AllAnswers } from '@/types/feedback';
 import { BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 
-export function buildReportEmail(report: InsightReportType, answers: AllAnswers): string {
+export function buildReportEmail(
+  report: InsightReportType, 
+  answers: AllAnswers,
+  contactInfo?: { name?: string; email?: string }
+): string {
   const ch1 = answers[1] || {};
   const roleLabels: Record<string, string> = {
     vpe: 'VP Engineering', cto: 'CTO', em: 'Eng Manager', staff: 'Staff Engineer',
@@ -38,6 +42,17 @@ export function buildReportEmail(report: InsightReportType, answers: AllAnswers)
         ${ch1.company_size_eng ? ` · ${ch1.company_size_eng} engineers` : ''}
       </p>
     </div>
+
+    <!-- Contact Info (if provided) -->
+    ${contactInfo?.name || contactInfo?.email ? `
+    <div style="background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:20px;margin-bottom:28px;">
+      <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;">👤 Participant Details</h2>
+      <div style="font-size:14px;color:#e2e8f0;">
+        ${contactInfo.name ? `<p style="margin:0 0 4px;"><strong>Name:</strong> ${contactInfo.name}</p>` : ''}
+        ${contactInfo.email ? `<p style="margin:0;"><strong>Email:</strong> ${contactInfo.email}</p>` : ''}
+      </div>
+    </div>
+    ` : ''}
 
     <!-- Score Cards -->
     <div style="display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;">
