@@ -112,6 +112,7 @@ export function useFeedbackSession() {
           consent: data.consent,
           contact_name: data.name,
           contact_email: data.email,
+          contact_phone: (data as any).phone,
         });
     } catch (e) {
       console.error('Error saving contacts:', e);

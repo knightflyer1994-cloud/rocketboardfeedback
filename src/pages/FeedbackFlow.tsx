@@ -222,6 +222,7 @@ export default function FeedbackFlow() {
   const [mode, setMode] = useState<FlowMode>('fast');
   const [currentChapter, setCurrentChapter] = useState(1);
   const [report, setReport] = useState<InsightReportType | null>(null);
+  const [contactData, setContactData] = useState<{name?: string, email?: string, phone?: string} | null>(null);
 
   const { session, answers, createSession, saveAnswer, updateSession, saveSummary, saveContacts } = useFeedbackSession();
   const { generatePDFBase64 } = useExportFeedback();
@@ -268,11 +269,13 @@ export default function FeedbackFlow() {
       await saveSummary(session.id, computed);
       
       if (ch10.follow_up_consent !== undefined) {
+        setContactData(piiData || null);
         await saveContacts(session.id, {
           consent: ch10.follow_up_consent,
           name: piiData?.name,
           email: piiData?.email,
-        });
+          phone: (piiData as any)?.phone,
+        } as any);
       }
 
       // Trigger real-time admin notification
@@ -307,22 +310,37 @@ export default function FeedbackFlow() {
   };
 
   const handleDemoRequest = async () => {
-    if (!session) return;
+    if (!session || !report) return;
     
     // Optimistic toast
     toast.promise(
       supabase.functions.invoke('send-email', {
         body: {
-          subject: `🚨 DEMO REQUEST: ${report?.keyThemes.role || 'Participant'}`,
+          subject: `🚨 DEMO REQUEST: ${contactData?.name || report.keyThemes.role || 'New Lead'}`,
           html: `
             <div style="font-family:sans-serif;background:#0f172a;color:#f8fafc;padding:40px;border-radius:12px;border:1px solid #1e293b;">
               <h1 style="color:#6366f1;margin:0 0 16px;">New Demo Request!</h1>
               <p style="font-size:16px;color:#94a3b8;">A participant has requested an early demo after completing their onboarding feedback.</p>
               
               <div style="background:#1e293b;border-radius:8px;padding:20px;margin:24px 0;">
-                <p style="margin:0 0 8px;"><strong>Role:</strong> ${report?.keyThemes.role || 'Unknown'}</p>
-                <p style="margin:0 0 8px;"><strong>Company Size:</strong> ${report?.keyThemes.companySize || 'Unknown'}</p>
+                <h3 style="color:#6366f1;margin:0 0 12px;text-transform:uppercase;font-size:12px;letter-spacing:0.05em;">👤 Contact Information</h3>
+                <p style="margin:0 0 8px;"><strong>Name:</strong> ${contactData?.name || 'Not provided'}</p>
+                <p style="margin:0 0 8px;"><strong>Work Email:</strong> ${contactData?.email || 'Not provided'}</p>
+                <p style="margin:0 0 8px;"><strong>Phone:</strong> ${contactData?.phone || 'Not provided'}</p>
+                
+                <h3 style="color:#6366f1;margin:16px 0 12px;text-transform:uppercase;font-size:12px;letter-spacing:0.05em;">🎯 Strategic Metrics</h3>
+                <p style="margin:0 0 8px;"><strong>Role:</strong> ${report.keyThemes.role || 'Unknown'}</p>
+                <p style="margin:0 0 8px;"><strong>Company Size:</strong> ${report.keyThemes.companySize || 'Unknown'}</p>
+                <p style="margin:0 0 8px;"><strong>Friction Score:</strong> ${report.frictionScore.toFixed(1)}/10</p>
+                <p style="margin:0 0 8px;"><strong>Strategic Alignment Index:</strong> ${report.visionScore}/10</p>
                 <p style="margin:0;"><strong>Report ID:</strong> ${session.id}</p>
+              </div>
+
+              <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:15px;margin-bottom:24px;">
+                <p style="margin:0;font-size:14px;color:#cbd5e1;">
+                  <strong>Insight:</strong> This lead has a <strong>${report.visionScore >= 8 ? 'High' : 'Moderate'}</strong> resonance with the RocketBoard vision.
+                  ${report.frictionScore > 7 ? ' Their organization is experiencing critical onboarding drag.' : ''}
+                </p>
               </div>
 
               <a href="${window.location.origin}/results" 

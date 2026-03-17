@@ -16,12 +16,14 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
   // Use local state for PII to prevent it from being written to the answers table via global onChange
   const [contactName, setContactName] = React.useState((answers.contact_name as string) || '');
   const [contactEmail, setContactEmail] = React.useState((answers.contact_email as string) || '');
+  const [contactPhone, setContactPhone] = React.useState((answers.contact_phone as string) || '');
 
   const handleComplete = () => {
     // We pass the local PII state back only at the final step
     (onComplete as any)({
       name: contactName,
-      email: contactEmail
+      email: contactEmail,
+      phone: contactPhone
     });
   };
 
@@ -93,6 +95,17 @@ export function Chapter10Closing({ answers, onChange, onComplete, saving }: Prop
                   className="w-full px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                 />
               </div>
+            </div>
+            {/* New Phone Field */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-foreground">Phone number (optional)</label>
+              <input
+                type="tel"
+                value={contactPhone}
+                onChange={e => setContactPhone(e.target.value)}
+                placeholder="+1 (555) 000-0000"
+                className="w-full px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
+              />
             </div>
           </div>
         )}
