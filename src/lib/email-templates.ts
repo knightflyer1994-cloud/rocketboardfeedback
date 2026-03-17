@@ -1,6 +1,21 @@
 import type { InsightReport as InsightReportType, AllAnswers } from '@/types/feedback';
 import { BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 
+/**
+ * Basic HTML escaping to prevent content injection or mail corruption
+ */
+function escapeHtml(text: string): string {
+  if (!text) return '';
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 export function buildReportEmail(
   report: InsightReportType, 
   answers: AllAnswers,
@@ -11,10 +26,16 @@ export function buildReportEmail(
     vpe: 'VP Engineering', cto: 'CTO', em: 'Eng Manager', staff: 'Staff Engineer',
     senior: 'Senior Engineer', director: 'Director of Eng', devex: 'DevEx / Platform', principal: 'Principal Engineer',
   };
-  const role = roleLabels[ch1.role as string] || (ch1.role as string) || 'Engineering Leader';
+  
+  const rawRole = (ch1.role as string) || 'Engineering Leader';
+  const role = roleLabels[rawRole] || escapeHtml(rawRole);
   const frictionColor = (report.frictionScore || 0) <= 3 ? '#10b981' : (report.frictionScore || 0) <= 6 ? '#f59e0b' : '#ef4444';
-  const topBots = (report.topBottlenecks || []).slice(0, 3).map(id => BOTTLENECK_CARDS.find(c => c.id === id)?.label || id).join(', ');
-  const topInts = (report.mustHaveIntegrations || []).slice(0, 3).map(id => INTEGRATION_OPTIONS.find(i => i.id === id)?.label || id).join(', ');
+  const topBots = (report.topBottlenecks || []).slice(0, 3).map(id => BOTTLENECK_CARDS.find(c => c.id === id)?.label || escapeHtml(id)).join(', ');
+  const topInts = (report.mustHaveIntegrations || []).slice(0, 3).map(id => INTEGRATION_OPTIONS.find(i => i.id === id)?.label || escapeHtml(id)).join(', ');
+
+  const safeName = escapeHtml(contactInfo?.name || '');
+  const safeEmail = escapeHtml(contactInfo?.email || '');
+  const safeCompanySize = escapeHtml(String(ch1.company_size_eng || ''));
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -39,17 +60,17 @@ export function buildReportEmail(
       </h1>
       <p style="margin:0;color:#94a3b8;font-size:14px;">
         Personalized for <strong style="color:#e2e8f0;">${role}</strong>
-        ${ch1.company_size_eng ? ` · ${ch1.company_size_eng} engineers` : ''}
+        ${safeCompanySize ? ` · ${safeCompanySize} engineers` : ''}
       </p>
     </div>
 
     <!-- Contact Info (if provided) -->
-    ${contactInfo?.name || contactInfo?.email ? `
+    ${safeName || safeEmail ? `
     <div style="background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:20px;margin-bottom:28px;">
       <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;">👤 Participant Details</h2>
       <div style="font-size:14px;color:#e2e8f0;">
-        ${contactInfo.name ? `<p style="margin:0 0 4px;"><strong>Name:</strong> ${contactInfo.name}</p>` : ''}
-        ${contactInfo.email ? `<p style="margin:0;"><strong>Email:</strong> ${contactInfo.email}</p>` : ''}
+        ${safeName ? `<p style="margin:0 0 4px;"><strong>Name:</strong> ${safeName}</p>` : ''}
+        ${safeEmail ? `<p style="margin:0;"><strong>Email:</strong> ${safeEmail}</p>` : ''}
       </div>
     </div>
     ` : ''}
@@ -88,8 +109,8 @@ export function buildReportEmail(
         <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;${idx < 2 ? 'border-bottom:1px solid #1f2937;' : ''}">
           <div style="width:28px;height:28px;border-radius:50%;background:${rankColors[idx]};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:800;color:white;text-align:center;line-height:28px;">${idx + 1}</div>
           <div>
-            <div style="font-size:13px;font-weight:700;color:#e2e8f0;">${card.label}</div>
-            <div style="font-size:11px;color:#64748b;margin-top:2px;">${card.desc}</div>
+            <div style="font-size:13px;font-weight:700;color:#e2e8f0;">${escapeHtml(card.label)}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">${escapeHtml(card.desc)}</div>
           </div>
         </div>`;
       }).join('')}
@@ -103,7 +124,7 @@ export function buildReportEmail(
         ${(report.mustHaveIntegrations || []).slice(0, 5).map((id, idx) => {
           const int = INTEGRATION_OPTIONS.find(i => i.id === id);
           if (!int) return '';
-          return `<span style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:999px;padding:4px 12px;font-size:11px;color:#a5b4fc;font-weight:600;">${idx + 1}. ${int.label}</span>`;
+          return `<span style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:999px;padding:4px 12px;font-size:11px;color:#a5b4fc;font-weight:600;">${idx + 1}. ${escapeHtml(int.label)}</span>`;
         }).join('')}
       </div>
     </div>` : ''}

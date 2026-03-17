@@ -35,28 +35,24 @@ Deno.serve(async (req) => {
     const FUNCTION_SECRET = Deno.env.get('SEND_EMAIL_SECRET');
     const authHeader = req.headers.get('Authorization');
 
-    const is_report_delivery = (payload as any).is_report_delivery;
-
-    // SECURITY: Disallow arbitrary 'to' addresses from public (unauthenticated) calls.
-    // We allow:
-    // 1. Admin alerts (hardcoded to ADMIN_EMAIL)
-    // 2. Report delivery (which we'll tag and monitor, or use a separate secret)
-    // 3. Authenticated calls with FUNCTION_SECRET
-    const isPublicAllowed = is_admin_alert || is_report_delivery;
+    // SECURITY: Disallow arbitrary relay from public calls.
+    // Admin alerts are allowed if is_admin_alert is true (will be sent ONLY to ADMIN_EMAIL).
+    // All other emails (including report delivery to users) MUST be authenticated via FUNCTION_SECRET.
+    const isPublicAllowed = is_admin_alert === true;
     
-    if (!isPublicAllowed && (!FUNCTION_SECRET || authHeader !== `Bearer ${FUNCTION_SECRET}`)) {
+    const isAuthenticated = FUNCTION_SECRET && authHeader === `Bearer ${FUNCTION_SECRET}`;
+
+    if (!isPublicAllowed && !isAuthenticated) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized: Arbitrary relay requires secret. Use is_admin_alert or is_report_delivery for public calls.' }),
+        JSON.stringify({ error: 'Unauthorized: Arbitrary relay requires authentication.' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Granular validation
+    // Validation
     const missing = [];
     if (!subject) missing.push('subject');
     if (!html) missing.push('html');
-    
-    // If it's an admin alert, we use ADMIN_EMAIL. If not, we need 'to' (and we already checked auth above).
     if (!is_admin_alert && !to) missing.push('to');
 
     if (missing.length > 0) {
@@ -67,17 +63,16 @@ Deno.serve(async (req) => {
     }
 
     if (is_admin_alert && !ADMIN_EMAIL) {
+      console.error('ADMIN_EMAIL is not configured');
       return new Response(
-        JSON.stringify({ error: 'ADMIN_EMAIL is not configured' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Configuration Error: Admin notifications are currently unavailable.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // SECURITY: Enforce that admin alerts ONLY go to the hardcoded admin email
     const targetRecipient = is_admin_alert ? ADMIN_EMAIL : to;
     
-    console.log(`[send-email] Sending to: ${targetRecipient} (Admin: ${is_admin_alert})`);
-
     const emailBody: Record<string, unknown> = {
       from: from || 'Rocketboard Feedback <reports@resend.dev>',
       to: [targetRecipient],
@@ -105,22 +100,14 @@ Deno.serve(async (req) => {
     const resendData = await resendRes.json();
 
     if (!resendRes.ok) {
-      console.error('Resend error:', JSON.stringify(resendData));
-
-      // Fuzzy-match sandbox restriction from both resendData.message and resendData.error.message
-      const resendErrorMsg: string =
-        resendData?.message ||
-        resendData?.error?.message ||
-        resendData?.error ||
-        '';
+      const resendErrorMsg: string = resendData?.message || resendData?.error?.message || resendData?.error || '';
 
       if (resendErrorMsg.includes('testing emails to your own email address')) {
         return new Response(
           JSON.stringify({
-            error: 'Resend Sandbox Restriction',
-            message: `Resend is in Sandbox mode. You can ONLY send emails to your authorized account email (kirannreddyaero@gmail.com). To send to others (like ${targetRecipient}), you MUST verify a domain at resend.com/domains.`,
-            suggestion: 'Go to resend.com/domains, add your domain, and update the "from" address in this function once verified.',
-            details: resendErrorMsg,
+            error: 'Domain Verification Required',
+            message: `The email delivery service is in restricted mode. Please verify your domain in the Resend dashboard to send emails to ${targetRecipient}.`,
+            suggestion: 'Go to resend.com/domains to add and verify your sender domain.',
           }),
           { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
