@@ -115,6 +115,91 @@ export function useExportFeedback() {
     renderMetric('Onboarding Friction', report.frictionScore || 0, 10);
     renderMetric('Strategic Alignment Index', report.visionScore ?? 0, contentW / 2 + 10);
 
+    // --- PAGE 2: EXECUTIVE SUMMARY ---
+    doc.addPage();
+    applyBackground();
+    y = margin + 15;
+    sectionHeading('Executive Strategic Summary');
+
+    const generateSummary = () => {
+      const { frictionScore, visionScore, keyThemes, topBottlenecks } = report;
+      const role = ROLE_LABELS[keyThemes.role || ''] || keyThemes.role || 'Engineering Leader';
+      
+      // 1. Current State
+      const frictionLevel = frictionScore > 7 ? 'Critical' : frictionScore > 4 ? 'Moderate' : 'Low';
+      const stateNarrative = `Based on the diagnostic data provided, the engineering organization is currently facing ${frictionLevel.toLowerCase()} operational friction (Score: ${frictionScore.toFixed(1)}/10). For a team of this profile, this indicates ${
+        frictionScore > 7 
+          ? 'significant systemic drag that is likely impacting time-to-market and developer retention.' 
+          : 'pockets of inefficiency that, while manageable now, will likely compound as the team scales.'
+      }`;
+
+      // 2. Primary Friction Mapping
+      const top3Names = topBottlenecks.slice(0, 3).map(id => BOTTLENECK_CARDS.find(c => c.id === id)?.label).filter(Boolean);
+      const bottleneckNarrative = `The primary drivers of this friction are identified as: ${top3Names.join(', ')}. These bottlenecks suggest a core breakdown in ${
+        topBottlenecks.includes('scattered_docs') || topBottlenecks.includes('stale_info') 
+          ? 'knowledge discoverability and documentation lifecycle management.' 
+          : 'access workflows and organizational context sharing.'
+      }`;
+
+      // 3. Strategic Recommendations
+      const recommendation = `To achieve a Strategic Alignment Index of 10/10, the organization should prioritize transitioning toward a "Self-Teaching" internal ecosystem. By leveraging technical moats like Zero-Hallucination AI and Citation Grounding, you can neutralize ${top3Names[0] || 'your core bottlenecks'} and reduce the cognitive load on senior mentors.`;
+
+      return { stateNarrative, bottleneckNarrative, recommendation };
+    };
+
+    const summary = generateSummary();
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.primary);
+    doc.text('I. CURRENT STATE ANALYSIS', margin, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+    let lines = doc.splitTextToSize(summary.stateNarrative, contentW);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 8;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.primary);
+    doc.text('II. PRIMARY FRICTION MAPPING', margin, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+    lines = doc.splitTextToSize(summary.bottleneckNarrative, contentW);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 8;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.primary);
+    doc.text('III. STRATEGIC RECOMMENDATION', margin, y);
+    y += 7;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+    lines = doc.splitTextToSize(summary.recommendation, contentW);
+    doc.text(lines, margin, y);
+    y += lines.length * 5 + 10;
+
+    // Qualitative Themes if available
+    if (report.keyThemes.openText || report.keyThemes.cultureVision) {
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...COLORS.primary);
+      doc.text('IV. QUALITATIVE OBSERVATIONS', margin, y);
+      y += 7;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(...COLORS.muted);
+      const observation = `The participant highlighted specific cultural and organizational nuances: "${(report.keyThemes.openText || report.keyThemes.cultureVision || '').substring(0, 200)}..."`;
+      lines = doc.splitTextToSize(observation, contentW);
+      doc.text(lines, margin, y);
+    }
+
     if (sessionId) {
       doc.setFontSize(8);
       doc.setTextColor(...COLORS.muted);
