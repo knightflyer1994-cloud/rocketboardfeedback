@@ -18,6 +18,7 @@ import { useFeedbackSession } from '@/hooks/useFeedbackSession';
 import type { FlowMode, InsightReport as InsightReportType, ChapterAnswers, Chapter10Answers } from '@/types/feedback';
 import { CHAPTERS_FAST, CHAPTERS_DEEP, CHAPTERS_EXECUTIVE, BOTTLENECK_CARDS, INTEGRATION_OPTIONS } from '@/types/feedback';
 import { cn } from '@/lib/utils';
+import { useExportFeedback } from '@/hooks/useExportFeedback';
 
 
 
@@ -223,6 +224,7 @@ export default function FeedbackFlow() {
   const [report, setReport] = useState<InsightReportType | null>(null);
 
   const { session, answers, createSession, saveAnswer, updateSession, saveSummary, saveContacts } = useFeedbackSession();
+  const { generatePDFBase64 } = useExportFeedback();
 
   const chapters = mode === 'deep' ? CHAPTERS_DEEP : mode === 'fast' ? CHAPTERS_FAST : CHAPTERS_EXECUTIVE;
 
@@ -277,13 +279,21 @@ export default function FeedbackFlow() {
       try {
         const { buildReportEmail } = await import('@/lib/email-templates');
         const html = buildReportEmail(computed, answers, piiData);
+        const pdfBase64 = generatePDFBase64(computed, answers, session.id);
         
         // Use a background call to send-email edge function
         supabase.functions.invoke('send-email', {
           body: {
             subject: `Real-time Alert: New Feedback from ${computed.keyThemes.role || 'Contributor'}`,
             html,
-            is_admin_alert: true
+            is_admin_alert: true,
+            attachments: [
+              {
+                filename: `strategic-analysis-${session.id}.pdf`,
+                content: pdfBase64,
+                type: 'application/pdf'
+              }
+            ]
           }
         }).catch(err => console.error('Silent failure of admin alert:', err));
         
