@@ -52,6 +52,36 @@ export type Database = {
           },
         ]
       }
+      feedback_contacts: {
+        Row: {
+          consent: boolean
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          session_id: string
+        }
+        Insert: {
+          consent?: boolean
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          session_id: string
+        }
+        Update: {
+          consent?: boolean
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       feedback_sessions: {
         Row: {
           company_size_eng: number | null
