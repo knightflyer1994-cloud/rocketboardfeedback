@@ -8,16 +8,16 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const COLORS = {
-  bg: [15, 15, 25] as [number, number, number],
-  primary: [99, 102, 241] as [number, number, number],
-  accent: [6, 182, 212] as [number, number, number],
-  danger: [239, 68, 68] as [number, number, number],
-  warning: [245, 158, 11] as [number, number, number],
-  success: [16, 185, 129] as [number, number, number],
-  text: [229, 231, 235] as [number, number, number],
-  muted: [148, 163, 184] as [number, number, number],
-  card: [30, 30, 48] as [number, number, number],
-  border: [51, 51, 75] as [number, number, number],
+  bg: [255, 255, 255] as [number, number, number],
+  primary: [37, 99, 235] as [number, number, number], // Royal Blue
+  title: [15, 23, 42] as [number, number, number],   // Navy
+  text: [30, 41, 59] as [number, number, number],    // Dark Slate
+  muted: [100, 116, 139] as [number, number, number],
+  danger: [220, 38, 38] as [number, number, number],
+  warning: [217, 119, 6] as [number, number, number],
+  success: [22, 163, 74] as [number, number, number],
+  cardBg: [248, 250, 252] as [number, number, number],
+  border: [226, 232, 240] as [number, number, number],
 };
 
 export function useExportFeedback() {
@@ -29,306 +29,263 @@ export function useExportFeedback() {
     const contentW = pageW - margin * 2;
     let y = margin;
 
-    const lineBreak = (extra = 6) => { y += extra; };
-
-    // Helper: Apply background to current page
     const applyBackground = () => {
       doc.setFillColor(...COLORS.bg);
       doc.rect(0, 0, pageW, pageH, 'F');
-      // Header accent bar
-      doc.setFillColor(...COLORS.primary);
-      doc.rect(0, 0, pageW, 1.5, 'F');
       
+      // Professional header line
+      doc.setDrawColor(...COLORS.primary);
+      doc.setLineWidth(0.5);
+      doc.line(margin, 15, pageW - margin, 15);
+
       // Footer
-      doc.setFontSize(7);
+      doc.setFontSize(8);
       doc.setTextColor(...COLORS.muted);
       doc.setFont('helvetica', 'normal');
-      doc.text('© RocketBoard Engineering · Research Report · Confidential', margin, pageH - 10);
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageW - margin, pageH - 10, { align: 'right' });
+      doc.text('RocketBoard Strategic Analysis - Confidential', margin, pageH - 12);
+      doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageW / 2, pageH - 12, { align: 'center' });
+      doc.text(`${new Date().toLocaleDateString()}`, pageW - margin, pageH - 12, { align: 'right' });
     };
 
     const checkPage = (needed = 20) => {
       if (y + needed > 275) {
         doc.addPage();
         applyBackground();
-        y = margin + 5;
+        y = margin + 10;
       }
     };
 
-    const heading = (text: string, size = 16, color = COLORS.primary) => {
+    const sectionHeading = (text: string) => {
       checkPage(15);
-      doc.setFontSize(size);
+      doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...color);
-      doc.text(text, margin, y);
-      y += 8;
-    };
-
-    const subheading = (text: string, size = 11, color = COLORS.muted) => {
-      checkPage(10);
-      doc.setFontSize(size);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...color);
-      doc.text(text, margin, y);
-      y += 6;
-    };
-
-    const body = (text: string, size = 9, color = COLORS.text, indent = 0) => {
-      checkPage(8);
-      doc.setFontSize(size);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...color);
-      const lines = doc.splitTextToSize(text, contentW - indent);
-      doc.text(lines, margin + indent, y);
-      y += lines.length * 5;
-    };
-
-    const scoreBar = (label: string, score: number, max = 10) => {
-      checkPage(15);
-      const pct = Math.min(score / max, 1);
-      const barW = contentW * 0.6;
-      const barH = 3;
-      const color = score <= 3 ? COLORS.success : score <= 6 ? COLORS.warning : COLORS.danger;
-
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...COLORS.text);
-      doc.text(label, margin, y);
-
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...color);
-      doc.text(`${score.toFixed(1)}/${max}`, margin + contentW, y, { align: 'right' });
-
-      y += 3;
-      doc.setFillColor(40, 40, 60);
-      doc.roundedRect(margin, y, barW, barH, 0.5, 0.5, 'F');
-      doc.setFillColor(...color);
-      doc.roundedRect(margin, y, barW * pct, barH, 0.5, 0.5, 'F');
-      y += 8;
-    };
-
-    const renderCard = (title: string, desc: string, icon: string, rank: number, color: [number, number, number]) => {
-      checkPage(25);
-      doc.setFillColor(...COLORS.card);
+      doc.setTextColor(...COLORS.title);
+      doc.text(text.toUpperCase(), margin, y);
+      y += 2;
       doc.setDrawColor(...COLORS.border);
-      doc.roundedRect(margin, y, contentW, 20, 3, 3, 'FD');
-
-      // Rank Circle
-      doc.setFillColor(...color);
-      doc.circle(margin + 10, y + 10, 4, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`${rank}`, margin + 10, y + 11.5, { align: 'center' });
-
-      // Content
-      doc.setTextColor(...COLORS.text);
-      doc.setFontSize(10);
-      doc.text(title, margin + 20, y + 7);
-      
-      doc.setTextColor(...COLORS.muted);
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      const lines = doc.splitTextToSize(desc, contentW - 35);
-      doc.text(lines, margin + 20, y + 12);
-
-      // Rank Label
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...color);
-      doc.text(`#${rank} Priority`, margin + contentW - 5, y + 8, { align: 'right' });
-
-      y += 24;
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, margin + contentW, y);
+      y += 8;
     };
 
-    // --- EXECUTION ---
+    // --- COVER PAGE ---
     applyBackground();
-
-    // COVER
-    y = 60;
-    doc.setFontSize(28);
+    y = 80;
+    doc.setFontSize(32);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...COLORS.primary);
+    doc.setTextColor(...COLORS.title);
     doc.text('Engineering Onboarding', margin, y);
     y += 12;
-    doc.text('Insight Report', margin, y);
+    doc.text('Strategic Insight Report', margin, y);
     
-    y += 15;
+    y += 25;
     const ch1 = answers[1] || {};
     const roleLabel = ROLE_LABELS[ch1.role as string] || (ch1.role as string) || 'Engineering Leader';
-    doc.setFontSize(14);
-    doc.setTextColor(...COLORS.accent);
-    doc.text(`Personalized for ${roleLabel}`, margin, y);
+    doc.setFontSize(16);
+    doc.setTextColor(...COLORS.primary);
+    doc.text(`Executive Briefing: ${roleLabel}`, margin, y);
     
-    y += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(...COLORS.muted);
-    if (ch1.company_size_eng) {
-      doc.text(`${ch1.company_size_eng} engineers · ${(ch1.work_mode as string || '').replace('_', ' ')} environment`, margin, y);
-    }
+    y += 10;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+    const meta = [
+      ch1.company_size_eng ? `${ch1.company_size_eng} Engineers` : null,
+      ch1.work_mode ? (ch1.work_mode as string).replace('_', ' ') : null
+    ].filter(Boolean).join(' | ');
+    doc.text(meta, margin, y);
 
-    y += 20;
-    doc.setDrawColor(...COLORS.border);
-    doc.line(margin, y, margin + contentW, y);
-    y += 15;
+    y += 40;
+    // Executive Metrics
+    doc.setFillColor(...COLORS.cardBg);
+    doc.roundedRect(margin, y, contentW, 40, 2, 2, 'F');
+    
+    const renderMetric = (label: string, score: number, xOff: number) => {
+      doc.setFontSize(9);
+      doc.setTextColor(...COLORS.muted);
+      doc.setFont('helvetica', 'bold');
+      doc.text(label.toUpperCase(), margin + xOff, y + 15);
+      
+      doc.setFontSize(24);
+      const color = score <= 3 ? COLORS.success : score <= 6 ? COLORS.warning : COLORS.danger;
+      doc.setTextColor(...color);
+      doc.text(`${score.toFixed(1)}/10`, margin + xOff, y + 28);
+    };
 
-    scoreBar('Onboarding Friction Score', report.frictionScore || 0);
-    scoreBar('Vision & Solution Fit', report.visionScore ?? 0);
+    renderMetric('Onboarding Friction', report.frictionScore || 0, 10);
+    renderMetric('Strategic Vision Fit', report.visionScore ?? 0, contentW / 2 + 10);
 
     if (sessionId) {
-      y = pageH - 25;
-      doc.setFontSize(7);
-      doc.setTextColor(50, 50, 80);
-      doc.text(`SESSION_TOKEN: ${sessionId}`, margin, y);
+      doc.setFontSize(8);
+      doc.setTextColor(...COLORS.muted);
+      doc.text(`Reference ID: ${sessionId}`, margin, pageH - 25);
     }
 
-    // PAGE 2: BOTTLENECKS
+    // --- PAGE 2: BOTTLENECKS ---
     doc.addPage();
     applyBackground();
-    y = margin + 10;
-    heading('🚧 Critical Bottlenecks');
-    body('Based on your feedback, these are the primary friction points impacting your engineering team\'s velocity and developer experience.', 9, COLORS.muted);
-    y += 5;
+    y = margin + 15;
+    sectionHeading('Operational Bottlenecks');
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...COLORS.text);
+    const intro = doc.splitTextToSize('The following table outlines the primary friction points identified within the engineering team\'s current onboarding lifecycle, ranked by their strategic priority.', contentW);
+    doc.text(intro, margin, y);
+    y += 15;
 
-    const rankColors: [number, number, number][] = [COLORS.danger, COLORS.warning, COLORS.primary];
     (report.topBottlenecks || []).forEach((id, idx) => {
       const card = BOTTLENECK_CARDS.find(c => c.id === id);
-      if (card) renderCard(card.label, card.desc, card.icon, idx + 1, rankColors[idx] || COLORS.primary);
+      if (!card) return;
+      
+      checkPage(30);
+      doc.setFillColor(...COLORS.cardBg);
+      doc.roundedRect(margin, y, contentW, 22, 1, 1, 'F');
+      
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...COLORS.title);
+      doc.text(`${idx + 1}. ${card.label}`, margin + 5, y + 8);
+      
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...COLORS.text);
+      const lines = doc.splitTextToSize(card.desc, contentW - 40);
+      doc.text(lines, margin + 5, y + 14);
+      
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      const rankColor = idx === 0 ? COLORS.danger : idx === 1 ? COLORS.warning : COLORS.primary;
+      doc.setTextColor(...rankColor);
+      doc.text(`PRIORITY LEVEL: ${idx + 1}`, margin + contentW - 5, y + 8, { align: 'right' });
+      
+      y += 28;
     });
 
-    // PAGE 3: ECOSYSTEM
+    // --- PAGE 3: ECOSYSTEM ---
     doc.addPage();
     applyBackground();
-    y = margin + 10;
-    heading('📚 Knowledge & Integrations', 16, COLORS.accent);
+    y = margin + 15;
+    sectionHeading('Knowledge Ecosystem & Tooling');
     
-    subheading('Knowledge Sources Mapped');
+    // Knowledge Sources
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.title);
+    doc.text('Current Knowledge Sources', margin, y);
+    y += 8;
+
     const ch4 = answers[4] || {};
-    const knowledgeSources = (ch4.knowledge_sources as string[]) || [];
-    const sourceFreshness = (ch4.source_freshness as Record<string, string>) || {};
-    
-    if (knowledgeSources.length > 0) {
-      let pillX = margin;
-      knowledgeSources.forEach(id => {
+    const sources = (ch4.knowledge_sources as string[]) || [];
+    const freshness = (ch4.source_freshness as Record<string, string>) || {};
+
+    if (sources.length > 0) {
+      sources.forEach(id => {
         const src = KNOWLEDGE_SOURCES.find(s => s.id === id);
         if (!src) return;
-        const fresh = sourceFreshness[id];
-        const statusColor = fresh === 'fresh' ? COLORS.success : fresh === 'stale' ? COLORS.danger : COLORS.warning;
-        
-        const label = `${src.label}`;
-        const w = doc.getTextWidth(label) + 12;
-        if (pillX + w > margin + contentW) { pillX = margin; y += 10; }
         checkPage(10);
+        const fresh = freshness[id];
+        const status = fresh === 'fresh' ? '(Optimized)' : fresh === 'stale' ? '(Needs Audit)' : '(Mixed)';
         
-        doc.setFillColor(30, 30, 50);
-        doc.roundedRect(pillX, y - 4, w, 7, 1, 1, 'F');
-        doc.setFillColor(...statusColor);
-        doc.circle(pillX + 3, y - 0.5, 1, 'F');
-        
-        doc.setFontSize(8);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
         doc.setTextColor(...COLORS.text);
-        doc.text(label, pillX + 6, y);
-        pillX += w + 3;
+        doc.text(`- ${src.label}`, margin + 5, y);
+        doc.setTextColor(...COLORS.muted);
+        doc.text(status, margin + 55, y);
+        y += 6;
       });
-      y += 15;
+      y += 10;
     }
 
-    subheading('Target Integrations');
-    const mustHaveInts = report.mustHaveIntegrations || [];
-    if (mustHaveInts.length > 0) {
-      let intX = margin;
-      mustHaveInts.forEach((id, idx) => {
-        const int = INTEGRATION_OPTIONS.find(i => i.id === id);
-        if (!int) return;
-        const label = `${idx + 1}. ${int.label}`;
-        const w = doc.getTextWidth(label) + 10;
-        if (intX + w > margin + contentW) { intX = margin; y += 10; }
-        checkPage(10);
-        doc.setFillColor(40, 40, 80);
-        doc.roundedRect(intX, y - 4, w, 7, 1, 1, 'F');
-        doc.setFontSize(8);
-        doc.setTextColor(200, 200, 255);
-        doc.text(label, intX + 5, y);
-        intX += w + 3;
-      });
-      y += 15;
-    }
+    // Integrations
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...COLORS.title);
+    doc.text('Target Integration Requirements', margin, y);
+    y += 8;
 
-    // PAGE 4: QUALITATIVE INSIGHTS
-    if (report.keyThemes && (
-      report.keyThemes.accessStory || 
-      report.keyThemes.cultureVision || 
-      report.keyThemes.redlineSources || 
-      report.keyThemes.aiGovernance || 
-      report.keyThemes.postMonth1 || 
-      report.keyThemes.openText ||
-      report.keyThemes.otherIntegrations
-    )) {
+    const ints = report.mustHaveIntegrations || [];
+    ints.forEach((id, idx) => {
+      const int = INTEGRATION_OPTIONS.find(i => i.id === id);
+      if (!int) return;
+      checkPage(10);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...COLORS.text);
+      doc.text(`${idx + 1}. ${int.label}`, margin + 5, y);
+      y += 6;
+    });
+
+    // --- PAGE 4: STRATEGIC INSIGHTS ---
+    if (report.keyThemes && Object.values(report.keyThemes).some(v => v && String(v).trim())) {
       doc.addPage();
       applyBackground();
-      y = margin + 10;
-      heading('💡 Qualitative Insights', 16, COLORS.accent);
-      body('This section captures your strategic nuance and specific organizational stories.', 9, COLORS.muted);
-      y += 5;
-
+      y = margin + 15;
+      sectionHeading('Strategic Qualitative Analysis');
+      
       const themes = report.keyThemes;
-      const renderInsight = (title: string, text?: string) => {
-        if (!text || text.trim().length === 0) return;
-        subheading(title, 10, COLORS.primary);
-        body(text, 9, COLORS.text, 2);
-        lineBreak(4);
+      const renderSection = (title: string, content?: string) => {
+        if (!content || !content.trim()) return;
+        checkPage(25);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...COLORS.primary);
+        doc.text(title, margin, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...COLORS.text);
+        const lines = doc.splitTextToSize(content, contentW - 5);
+        doc.text(lines, margin, y);
+        y += lines.length * 5 + 8;
       };
 
-      renderInsight('Access & Onboarding Friction', themes.accessStory);
-      renderInsight('Culture & Human Connection', themes.cultureVision);
-      renderInsight('Other Critical Systems', themes.otherIntegrations);
-      
-      // Combine per-category others
-      const perCategoryOthers = Object.entries(answers[5] || {})
-        .filter(([k, v]) => k.startsWith('other_') && k !== 'other_integrations' && v && String(v).trim().length > 0)
-        .map(([k, v]) => `${k.replace('other_', '')}: ${v}`)
-        .join('; ');
-      
-      if (perCategoryOthers) {
-        renderInsight('Specific Category Additions', perCategoryOthers);
-      }
-
-      renderInsight('Governance & Red-Lines', themes.redlineSources);
-      renderInsight('AI Security & Policy', themes.aiGovernance);
-      renderInsight('Long-term Platform Value', themes.postMonth1);
-      renderInsight('Final Strategic Thoughts', themes.openText);
+      renderSection('Workflow & Access Friction', themes.accessStory);
+      renderSection('Organizational Culture', themes.cultureVision);
+      renderSection('Governance & Compliance', themes.redlineSources);
+      renderSection('AI Security Integration', themes.aiGovernance);
+      renderSection('Platform Scaling Strategy', themes.postMonth1);
+      renderSection('Additional Observations', themes.openText);
     }
 
-    // PAGE 5: RAW DATA
+    // --- PAGE 5: AUDIT LOG ---
     doc.addPage();
     applyBackground();
-    y = margin + 10;
-    heading('🗂️ Response Audit Log', 16, COLORS.muted);
+    y = margin + 15;
+    sectionHeading('Response Audit Log');
     
-    Object.entries(answers).sort((a, b) => Number(a[0]) - Number(b[0])).forEach(([chNum, chAnswers]) => {
-      checkPage(15);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...COLORS.primary);
-      doc.text(`Chapter ${chNum}`, margin, y);
-      y += 6;
+    doc.setFontSize(8);
+    doc.setTextColor(...COLORS.muted);
+    doc.text('Detailed trace of raw participant responses for data integrity and archival purposes.', margin, y);
+    y += 10;
 
-      Object.entries(chAnswers).forEach(([key, val]) => {
+    Object.entries(answers).sort((a, b) => Number(a[0]) - Number(b[0])).forEach(([chNum, chData]) => {
+      checkPage(20);
+      doc.setFillColor(...COLORS.cardBg);
+      doc.rect(margin, y - 5, contentW, 7, 'F');
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...COLORS.title);
+      doc.text(`CHAPTER ${chNum}`, margin + 3, y);
+      y += 8;
+
+      Object.entries(chData).forEach(([key, val]) => {
         checkPage(10);
-        const displayVal = Array.isArray(val) ? val.join(', ') : typeof val === 'object' ? JSON.stringify(val) : String(val ?? '—');
+        const displayVal = Array.isArray(val) ? val.join(', ') : typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'N/A');
         
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...COLORS.muted);
-        doc.text(`${key}:`, margin + 3, y);
+        doc.setTextColor(...COLORS.text);
+        doc.text(`${key}:`, margin + 5, y);
         
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...COLORS.text);
-        const lines = doc.splitTextToSize(displayVal, contentW - 25);
-        doc.text(lines, margin + 25, y);
-        y += lines.length * 4 + 2;
+        const lines = doc.splitTextToSize(displayVal, contentW - 40);
+        doc.text(lines, margin + 40, y);
+        y += Math.max(lines.length * 4, 6);
       });
-      y += 4;
+      y += 6;
     });
 
     return doc;
@@ -336,8 +293,7 @@ export function useExportFeedback() {
 
   const generatePDF = (report: InsightReport, answers: AllAnswers, sessionId?: string): void => {
     const doc = renderDoc(report, answers, sessionId);
-    const filename = `onboarding-insight-report-${sessionId || Date.now()}.pdf`;
-    doc.save(filename);
+    doc.save(`rocketboard-analysis-${sessionId || Date.now()}.pdf`);
   };
 
   const generatePDFBase64 = (report: InsightReport, answers: AllAnswers, sessionId?: string): string => {
@@ -346,4 +302,6 @@ export function useExportFeedback() {
   };
 
   return { generatePDF, generatePDFBase64 };
+}
+eratePDFBase64 };
 }
