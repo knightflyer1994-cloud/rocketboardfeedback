@@ -43,7 +43,7 @@ export function useExportFeedback() {
       doc.setTextColor(...COLORS.muted);
       doc.setFont('helvetica', 'normal');
       doc.text('RocketBoard Strategic Analysis - Confidential', margin, pageH - 12);
-      doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageW / 2, pageH - 12, { align: 'center' });
+      doc.text(`Page ${doc.getNumberOfPages()}`, pageW / 2, pageH - 12, { align: 'center' });
       doc.text(`${new Date().toLocaleDateString()}`, pageW - margin, pageH - 12, { align: 'right' });
     };
 
@@ -302,6 +302,4 @@ export function useExportFeedback() {
   };
 
   return { generatePDF, generatePDFBase64 };
-}
-eratePDFBase64 };
 }
