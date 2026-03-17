@@ -65,7 +65,7 @@ export function buildReportEmail(
       <div style="flex:1;min-width:140px;background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:20px;text-align:center;">
         <div style="font-size:22px;margin-bottom:6px;">🎯</div>
         <div style="font-size:32px;font-weight:800;color:#6366f1;">${report.visionScore || '—'}</div>
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;">Vision Fit</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-top:4px;">Strategic Alignment Index</div>
         <div style="font-size:10px;color:#475569;margin-top:2px;">out of 10</div>
       </div>
       <div style="flex:1;min-width:140px;background:#1e1e2e;border:1px solid #2d2d3a;border-radius:12px;padding:20px;text-align:center;">

@@ -101,7 +101,7 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
         <div className="p-5 rounded-xl border border-border bg-card space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-xl">🎯</span>
-            <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wider">Vision Fit</span>
+            <span className="text-sm font-heading font-semibold text-muted-foreground uppercase tracking-wider">Strategic Alignment Index</span>
           </div>
           <div className="flex items-end gap-2">
             <span className="text-5xl font-heading font-bold text-primary">{report.visionScore ?? 0}</span>

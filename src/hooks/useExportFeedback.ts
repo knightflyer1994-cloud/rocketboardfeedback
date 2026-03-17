@@ -113,7 +113,7 @@ export function useExportFeedback() {
     };
 
     renderMetric('Onboarding Friction', report.frictionScore || 0, 10);
-    renderMetric('Strategic Vision Fit', report.visionScore ?? 0, contentW / 2 + 10);
+    renderMetric('Strategic Alignment Index', report.visionScore ?? 0, contentW / 2 + 10);
 
     if (sessionId) {
       doc.setFontSize(8);
