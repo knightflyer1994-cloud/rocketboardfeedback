@@ -175,7 +175,7 @@ export default function Results() {
                       </button>
                     </div>
                     <h3 className="font-heading font-semibold text-foreground truncate">
-                      {s.role || 'Unknown Role'}
+                      {s.role || s.summary?.keyThemes?.role || 'Unknown Role'}
                     </h3>
                     <div className="flex justify-between items-end mt-2">
                       <p className="text-xs text-muted-foreground italic">
@@ -229,6 +229,7 @@ export default function Results() {
                     <InsightReport 
                       report={selectedSubmission.summary} 
                       answers={detailedAnswers}
+                      sessionId={selectedId}
                       onRequestDemo={async () => {
                         toast.promise(
                           supabase.functions.invoke('send-email', {

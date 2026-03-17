@@ -70,9 +70,10 @@ export function useFeedbackSession() {
     setSession(prev => prev ? { ...prev, ...updates } : prev);
     try {
       const { mode: _mode, id: _id, ...dbUpdates } = updates as SessionData;
-      // NOTE: Update is now restricted for anon. We will skip this update on the client
-      // or handle via session summary at the end.
-      console.log('Session metadata update requested (skipping due to RLS lockdown):', updates);
+      await supabase
+        .from('feedback_sessions')
+        .update(dbUpdates)
+        .eq('id', sessionId);
     } catch (e) {
       console.error('Error updating session:', e);
     }

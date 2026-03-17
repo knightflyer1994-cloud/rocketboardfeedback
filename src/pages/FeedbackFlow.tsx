@@ -234,7 +234,13 @@ export default function FeedbackFlow() {
   const handleChange = useCallback(async (key: string, value: unknown) => {
     if (!session) return;
     await saveAnswer(session.id, currentChapter, key, value);
-  }, [session, currentChapter, saveAnswer]);
+
+    // Sync key metadata to the sessions table for easier dashboard filtering
+    const sessionFields = ['role', 'company_size_eng', 'work_mode'];
+    if (sessionFields.includes(key)) {
+      await updateSession(session.id, { [key]: value });
+    }
+  }, [session, currentChapter, saveAnswer, updateSession]);
 
   const handleModeSelect = async (selectedMode: FlowMode) => {
     setMode(selectedMode);
