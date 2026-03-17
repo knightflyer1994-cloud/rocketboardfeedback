@@ -4,7 +4,7 @@ import { BOTTLENECK_CARDS, KNOWLEDGE_SOURCES, INTEGRATION_OPTIONS } from '@/type
 import { useExportFeedback } from '@/hooks/useExportFeedback';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Download, Mail, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 
 interface Props {
   report: InsightReportType;
@@ -32,13 +32,8 @@ function ScoreMeter({ score, max = 10, label }: { score: number; max?: number; l
   );
 }
 
-import { buildReportEmail } from '@/lib/email-templates';
-
 export function InsightReport({ report, answers, sessionId, onRequestDemo }: Props) {
-  const { generatePDF, generatePDFBase64 } = useExportFeedback();
-  const [emailTarget, setEmailTarget] = useState('');
-  const [sendingEmail, setSendingEmail] = useState(false);
-  const [showEmailForm, setShowEmailForm] = useState(false);
+  const { generatePDF } = useExportFeedback();
 
   const roleLabels: Record<string, string> = {
     vpe: 'VP Engineering', cto: 'CTO', em: 'Eng Manager', staff: 'Staff Engineer',
@@ -64,41 +59,6 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
     }
   };
 
-  const handleSendEmail = async () => {
-    if (!emailTarget || !emailTarget.includes('@')) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
-    setSendingEmail(true);
-    try {
-      const html = buildReportEmail(report, answers);
-      const pdfBase64 = generatePDFBase64(report, answers, sessionId);
-
-      const { data, error } = await supabase.functions.invoke('send-email', {
-        body: {
-          to: emailTarget,
-          subject: `Your Engineering Onboarding Insight Report`,
-          html,
-          is_report_delivery: true,
-          attachments: [{
-            filename: `onboarding-insight-report.pdf`,
-            content: pdfBase64,
-            type: 'application/pdf',
-          }],
-        },
-      });
-
-      if (error) throw error;
-      toast.success(`Report sent to ${emailTarget}!`);
-      setShowEmailForm(false);
-      setEmailTarget('');
-    } catch (e) {
-      console.error(e);
-      toast.error('Failed to send email. Check your Resend configuration.');
-    } finally {
-      setSendingEmail(false);
-    }
-  };
 
   const topBottlenecks = report.topBottlenecks || [];
   const mustHaveIntegrations = report.mustHaveIntegrations || [];
@@ -271,36 +231,6 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
         </div>
       )}
 
-      {/* Email form */}
-      {showEmailForm && (
-        <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 space-y-3 animate-slide-in-up">
-          <p className="text-sm font-heading font-semibold text-foreground">Send report to email</p>
-          <p className="text-xs text-muted-foreground">A premium HTML summary + PDF audit log attachment will be delivered.</p>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              placeholder="you@company.com"
-              value={emailTarget}
-              onChange={e => setEmailTarget(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/50 outline-none"
-              onKeyDown={e => e.key === 'Enter' && handleSendEmail()}
-            />
-            <button
-              onClick={handleSendEmail}
-              disabled={sendingEmail}
-              className="px-4 py-2 rounded-lg gradient-button text-primary-foreground text-sm font-heading font-semibold disabled:opacity-50 flex items-center gap-2"
-            >
-              {sendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
-            </button>
-            <button
-              onClick={() => setShowEmailForm(false)}
-              className="px-3 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:bg-secondary"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* CTA */}
       <div className="p-6 rounded-xl border border-primary/20 bg-primary/5 text-center space-y-4">
@@ -322,13 +252,6 @@ export function InsightReport({ report, answers, sessionId, onRequestDemo }: Pro
           >
             <Download className="w-4 h-4" />
             Download PDF Report
-          </button>
-          <button
-            onClick={() => setShowEmailForm(v => !v)}
-            className="px-6 py-3 rounded-xl border border-primary/30 bg-primary/10 text-primary font-heading font-semibold hover:bg-primary/20 transition-all flex items-center justify-center gap-2"
-          >
-            <Mail className="w-4 h-4" />
-            Email This Report
           </button>
         </div>
       </div>
