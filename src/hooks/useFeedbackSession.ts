@@ -49,12 +49,15 @@ export function useFeedbackSession() {
     try {
       await supabase
         .from('feedback_answers')
-        .insert({
-          session_id: sessionId,
-          chapter,
-          question_key: questionKey,
-          answer: { value: value as any },
-        });
+        .upsert(
+          {
+            session_id: sessionId,
+            chapter,
+            question_key: questionKey,
+            answer: { value: value as any },
+          },
+          { onConflict: 'session_id, chapter, question_key' }
+        );
     } catch (e) {
       console.error('Error saving answer:', e);
     }
