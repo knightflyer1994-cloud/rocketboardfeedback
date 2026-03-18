@@ -7,6 +7,15 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+interface RawSummary {
+  friction_score: number | null;
+  vision_score: number | null;
+  key_themes: Record<string, unknown>;
+  top_bottlenecks: string[];
+  knowledge_concentration: string[];
+  must_have_integrations: string[];
+}
+
 interface Submission {
   id: string;
   created_at: string;
@@ -14,7 +23,7 @@ interface Submission {
   role: string | null;
   company_size_eng: number | null;
   completed: boolean;
-  summary?: InsightReportType;
+  summary?: RawSummary | null;
 }
 
 export default function Results() {
