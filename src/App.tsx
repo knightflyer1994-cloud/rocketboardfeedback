@@ -20,13 +20,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<FeedbackFlow />} />
           <Route path="/login" element={<Login />} />
-          <Route
-            path="/results"
+          <Route 
+            path="/results" 
             element={
               <ProtectedRoute>
                 <Results />
               </ProtectedRoute>
-            }
+            } 
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
